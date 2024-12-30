@@ -442,6 +442,7 @@ class FaceTracker:
 
 # Initialize Flask and global objects
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*")
 cap = None
 
@@ -719,5 +720,16 @@ def handle_disconnect():
     except Exception as e:
         logger.error(f"Error handling disconnection: {str(e)}")
 
-# Add this line at the end of the file
+@socketio.on('error')
+def handle_error(error):
+    logger.error(f"Socket error: {error}")
+    emit('error', {'message': str(error)})
+
+# Remove/comment this block
+"""
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
+"""
+
+# Add this instead
 app = socketio.run(app)
