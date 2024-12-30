@@ -78,23 +78,23 @@ Enable region locking to limit mouse movement to a specific area of your screen.
 - **REGION_BOUNDS**: Define the region of the screen where the mouse can move.
 - **DEBUG_MODE**: Enable detailed logging for debugging.
 
-### Troubleshooting
+## Troubleshooting
 **Camera not opening**: Ensure that no other application is using the camera. Restart the application if necessary.
 **Calibration issues**: If calibration fails, ensure you're staying still and not moving too much. The system requires a steady face for accurate calibration.
 **Performance issues**: Lower the camera resolution or frame rate if the application lags on slower systems.
 
-### License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ### Contributing
 Feel free to fork the repository, submit issues, and open pull requests for improvements. Whether it's bug fixes, new features, or better documentation, your contributions are welcome!
 
-### Acknowledgements
+## Acknowledgements
 **dlib**: For face detection and facial landmark prediction.
 **pyautogui**: For simulating mouse movements.
 **OpenCV**: For image processing and capturing camera frames.
 
-### Contact
+## Contact
 If you have any questions, feel free to open an issue on the GitHub repository.
 
 Happy tracking! 👀💻
