@@ -34,23 +34,22 @@
    ```bash
    git clone https://github.com/Mrtracker-new/CursorCam.git
    cd CursorCam
-Install dependencies:
+### Install dependencies:
 
-bash
-Copy code
-pip install -r requirements.txt
-Download the shape predictor model:
+    pip install -r requirements.txt
+    Download the shape predictor model:
 
 Download the shape_predictor_68_face_landmarks.dat from dlib's model repository and place it in the root directory of the project.
-Run the Flask app:
 
-bash
-Copy code
-python app.py
+### Run the Flask app:
+
+    python app.py
+
 Open a web browser and go to http://127.0.0.1:5000/ to start using CursorCam.
 
-Usage
-Calibration:
+## Usage
+
+### Calibration:
 
 To begin using the face tracking system, you need to calibrate by sitting still in front of the camera for a few moments. Calibration ensures that the system tracks your face with precision.
 Once calibrated, the system will track your face and move the mouse cursor based on your facial movements.
@@ -65,32 +64,37 @@ Load and switch between profiles based on different users or preferences.
 Region Locking:
 
 Enable region locking to limit mouse movement to a specific area of your screen. This is useful for users who prefer a restricted movement area.
-Configuration
-You can customize various settings in the Config class:
 
-CAMERA_WIDTH and CAMERA_HEIGHT: Set the resolution of the camera feed.
-FPS: Frame rate for the camera.
-MOUSE_SMOOTHING: The smoothing factor applied to mouse movement.
-MOUSE_SPEED: Adjust the sensitivity of the mouse movement based on face displacement.
-SCREEN_PADDING: Padding around the edges of the screen where the cursor can't go.
-CALIBRATION_FRAMES and CALIBRATION_THRESHOLD: Control the calibration process.
-REGION_BOUNDS: Define the region of the screen where the mouse can move.
-DEBUG_MODE: Enable detailed logging for debugging.
-Troubleshooting
-Camera not opening: Ensure that no other application is using the camera. Restart the application if necessary.
-Calibration issues: If calibration fails, ensure you're staying still and not moving too much. The system requires a steady face for accurate calibration.
-Performance issues: Lower the camera resolution or frame rate if the application lags on slower systems.
-License
+## Configuration
+
+### You can customize various settings in the Config class:
+
+- **CAMERA_WIDTH and CAMERA_HEIGHT**: Set the resolution of the camera feed.
+- **FPS**: Frame rate for the camera.
+- **MOUSE_SMOOTHING**: The smoothing factor applied to mouse movement.
+- **MOUSE_SPEED**: Adjust the sensitivity of the mouse movement based on face displacement.
+- **SCREEN_PADDING**: Padding around the edges of the screen where the cursor can't go.
+- **CALIBRATION_FRAMES and CALIBRATION_THRESHOLD**: Control the calibration process.
+- **REGION_BOUNDS**: Define the region of the screen where the mouse can move.
+- **DEBUG_MODE**: Enable detailed logging for debugging.
+
+### Troubleshooting
+**Camera not opening**: Ensure that no other application is using the camera. Restart the application if necessary.
+**Calibration issues**: If calibration fails, ensure you're staying still and not moving too much. The system requires a steady face for accurate calibration.
+**Performance issues**: Lower the camera resolution or frame rate if the application lags on slower systems.
+
+### License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-Contributing
+### Contributing
 Feel free to fork the repository, submit issues, and open pull requests for improvements. Whether it's bug fixes, new features, or better documentation, your contributions are welcome!
 
-Acknowledgements
-dlib: For face detection and facial landmark prediction.
-pyautogui: For simulating mouse movements.
-OpenCV: For image processing and capturing camera frames.
-Contact
+### Acknowledgements
+**dlib**: For face detection and facial landmark prediction.
+**pyautogui**: For simulating mouse movements.
+**OpenCV**: For image processing and capturing camera frames.
+
+### Contact
 If you have any questions, feel free to open an issue on the GitHub repository.
 
 Happy tracking! 👀💻
