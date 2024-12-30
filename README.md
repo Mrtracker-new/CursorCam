@@ -90,9 +90,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 Feel free to fork the repository, submit issues, and open pull requests for improvements. Whether it's bug fixes, new features, or better documentation, your contributions are welcome!
 
 ## Acknowledgements
-- ### dlib: For face detection and facial landmark prediction.
-- ### pyautogui: For simulating mouse movements.
-- ### OpenCV: For image processing and capturing camera frames.
+- ### **dlib**: For face detection and facial landmark prediction.
+- ### **pyautogui**: For simulating mouse movements.
+- ### **OpenCV**: For image processing and capturing camera frames.
 
 ## Contact
 If you have any questions, feel free to open an issue on the GitHub repository.
