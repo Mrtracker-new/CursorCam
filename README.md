@@ -1,7 +1,7 @@
-CursorCam: Hands-Free Mouse Control
-CursorCam is a hands-free mouse control system that uses facial recognition to control the cursor using your laptop’s camera. This project provides an innovative and accessible way to navigate and interact with your computer without the need for a physical mouse.
+## CursorCam: Hands-Free Mouse Control
+** CursorCam is a hands-free mouse control system that uses facial recognition to control the cursor using your laptop’s camera. This project provides an innovative and accessible way to navigate and interact with your computer without the need for a physical mouse.
 
-Features
+# Features
 Facial Recognition: Tracks your face and translates movement into cursor control.
 Hands-Free Control: Navigate, click, and scroll without touching any input devices.
 Customizable Sensitivity: Adjust the speed and sensitivity of cursor movement.
