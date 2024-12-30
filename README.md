@@ -21,35 +21,26 @@
    ```bash
    git clone https://github.com/Mrtracker-new/CursorCam.git
    cd CursorCam
-Install dependencies:
+**Install dependencies**:
+            
+    pip install -r requirements.txt
+**Ensure cmake is installed**:
 
-bash
-Copy code
-pip install -r requirements.txt
-Ensure cmake is installed:
+**On Ubuntu/Debian**:
 
-On Ubuntu/Debian:
-bash
-Copy code
-sudo apt update
-sudo apt install cmake
-On Windows: Download and install CMake, making sure to add it to your system PATH.
+    sudo apt update
+    sudo apt install cmake
+**On Windows**: Download and install CMake, making sure to add it to your system PATH.
 Run the application:
 
-bash
-Copy code
-python cursor_cam.py
-Usage
+    python app.py
+
+**Usage**
 Position your face in front of the laptop's camera.
 The cursor will follow your facial movements, and you can interact with the screen by looking in different directions.
 Adjust the sensitivity and tracking settings in the configuration file.
 Contributing
 Feel free to fork this repository, submit issues, and create pull requests. Contributions are welcome!
 
-License
+**License**
 This project is licensed under the MIT License.
-
-vbnet
-Copy code
-
-This format is ready to be copied into a GitHub repository’s `README.md` file. Let me know if you'd like any fu
