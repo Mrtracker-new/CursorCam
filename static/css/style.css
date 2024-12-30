@@ -1,0 +1,517 @@
+/* CSS Variables for better maintainability */
+:root {
+  --primary-color: #ff0000;
+  --primary-dark: #cc0000;
+  --primary-darker: #990000;
+  --bg-dark: #1a1a1a;
+  --bg-darker: #000000;
+  --text-light: #ffffff;
+  --shadow-red: rgba(255, 0, 0, 0.3);
+}
+
+/* Base styles */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Header styles */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.header h1 {
+    color: #ff0000;
+    margin: 0;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.3);
+}
+
+/* Video container styles */
+.video-container {
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    border: 2px solid #ff0000;
+    background-color: #000000;
+}
+
+.video-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Control panel styles */
+.controls {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+}
+
+/* Button styles */
+button {
+    padding: 12px 24px;
+    margin: 0 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+button:focus-visible {
+    outline: 2px solid var(--text-light);
+    outline-offset: 2px;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-red);
+}
+
+button:active {
+    transform: translateY(0);
+    background-color: #990000;
+}
+
+button:disabled {
+    background-color: #666666;
+    cursor: not-allowed;
+}
+
+/* Sensitivity slider styles */
+.sensitivity {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    border: 1px solid #ff0000;
+}
+
+.sensitivity label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ff0000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sensitivity-value {
+    margin-top: 10px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+#sensitivity-display {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.sensitivity input[type="range"] {
+    width: 200px;
+    margin: 0 auto;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #333333;
+    height: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+.sensitivity input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #ff0000;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sensitivity input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ff0000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.sensitivity input[type="range"]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    background: #ff0000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.sensitivity input[type="range"]::-webkit-slider-thumb:hover {
+    background: #cc0000;
+    transform: scale(1.2);
+}
+
+.sensitivity input[type="range"]::-moz-range-thumb:hover {
+    background: #cc0000;
+    transform: scale(1.2);
+}
+
+.sensitivity input[type="range"]::-ms-thumb:hover {
+    background: #cc0000;
+    transform: scale(1.2);
+}
+
+/* Track styles */
+.sensitivity input[type="range"]::-webkit-slider-runnable-track {
+    background: #333333;
+    height: 5px;
+    border-radius: 5px;
+}
+
+.sensitivity input[type="range"]::-moz-range-track {
+    background: #333333;
+    height: 5px;
+    border-radius: 5px;
+}
+
+.sensitivity input[type="range"]::-ms-track {
+    background: #333333;
+    height: 5px;
+    border-radius: 5px;
+    border: none;
+    color: transparent;
+}
+
+/* Gesture feedback styles */
+.gesture-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff0000;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 24px;
+    z-index: 1000;
+    animation: popFeedback 800ms ease-in-out;
+    border: 2px solid #ff0000;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
+/* Instructions panel styles */
+.instructions {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    z-index: 1000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+    max-width: 300px;
+    border: 1px solid #ff0000;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #ff0000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.instructions p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+/* Status indicator styles */
+.status-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff0000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animations */
+@keyframes popFeedback {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.8); 
+    }
+    20% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1); 
+    }
+    30% { 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+    70% { 
+        opacity: 1; 
+    }
+    100% { 
+        opacity: 0; 
+    }
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Profile selector styles */
+.profile-selector {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    border: 1px solid #ff0000;
+}
+
+.profile-selector select {
+    padding: 8px 15px;
+    background: #333333;
+    color: white;
+    border: 1px solid #ff0000;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+}
+
+.profile-selector select:hover {
+    background: #444444;
+}
+
+/* Debug info styles */
+.debug-info {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ff0000;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 12px;
+    z-index: 1000;
+    border: 1px solid #ff0000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    :root {
+        /* Adjust spacing for mobile */
+        --container-padding: 10px;
+        --element-spacing: 15px;
+    }
+
+    .container {
+        padding: var(--container-padding);
+    }
+    
+    .video-container {
+        margin: var(--element-spacing) auto;
+        width: 100%;
+    }
+    
+    .instructions {
+        position: fixed;
+        bottom: var(--element-spacing);
+        right: var(--element-spacing);
+        left: var(--element-spacing);
+        max-width: none;
+        font-size: 14px;
+    }
+    
+    /* Improved touch targets for mobile */
+    button {
+        padding: 15px 25px;
+        font-size: 16px;
+        margin: 8px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* Add this to your existing CSS file */
+
+.footer-message {
+    margin-top: 50px;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 2px solid #ff0000;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.footer-message p {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.footer-message .highlight {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.footer-signature {
+    margin-top: 15px;
+    font-style: italic;
+    color: #ff0000;
+    font-size: 20px;
+    text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+}
+
+/* Logo styles */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive logo */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .logo {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Button states */
+button.active {
+    background-color: #cc0000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+}
+
+#toggleTracking.active {
+    background-color: #cc0000;
+}
+
+#toggleTracking:not(.active) {
+    background-color: #ff0000;
+}
+
+/* Update button styles */
+#toggleTracking {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#toggleTracking.active {
+    background-color: var(--primary-dark);
+    box-shadow: 0 0 15px var(--shadow-red);
+    transform: scale(1.05);
+}
+
+#toggleTracking:not(.active) {
+    background-color: var(--primary-color);
+    transform: scale(1);
+}
+
+#toggleTracking::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#toggleTracking.active::before {
+    opacity: 1;
+}
+
+/* Add smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Improve performance with hardware acceleration */
+.gesture-feedback,
+.logo:hover,
+button:hover {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
