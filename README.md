@@ -1,24 +1,26 @@
 # CursorCam: Hands-Free Mouse Control
-** CursorCam is a hands-free mouse control system that uses facial recognition to control the cursor using your laptop’s camera. This project provides an innovative and accessible way to navigate and interact with your computer without the need for a physical mouse.**
 
-# Features
-Facial Recognition: Tracks your face and translates movement into cursor control.
-Hands-Free Control: Navigate, click, and scroll without touching any input devices.
-Customizable Sensitivity: Adjust the speed and sensitivity of cursor movement.
-Accessibility: Ideal for users with limited mobility.
-Installation
-Requirements:
-Python 3.x
-OpenCV
-dlib
-cmake
-Steps:
-Clone the repository:
+**CursorCam** is a hands-free mouse control system that uses facial recognition to control the cursor using your laptop’s camera. This project provides an innovative and accessible way to navigate and interact with your computer without the need for a physical mouse.
 
-bash
-Copy code
-git clone https://github.com/Mrtracker-new/CursorCam.git
-cd CursorCam
+## Features
+- **Facial Recognition**: Tracks your face and translates movement into cursor control.
+- **Hands-Free Control**: Navigate, click, and scroll without touching any input devices.
+- **Customizable Sensitivity**: Adjust the speed and sensitivity of cursor movement.
+- **Accessibility**: Ideal for users with limited mobility.
+
+## Installation
+
+### Requirements:
+- Python 3.x
+- OpenCV
+- dlib
+- cmake
+
+### Steps:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Mrtracker-new/CursorCam.git
+   cd CursorCam
 Install dependencies:
 
 bash
@@ -47,3 +49,7 @@ Feel free to fork this repository, submit issues, and create pull requests. Cont
 License
 This project is licensed under the MIT License.
 
+vbnet
+Copy code
+
+This format is ready to be copied into a GitHub repository’s `README.md` file. Let me know if you'd like any fu
