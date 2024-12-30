@@ -442,7 +442,7 @@ class FaceTracker:
 
 # Initialize Flask and global objects
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*")
 cap = None
 
 # Create global face tracker instance
@@ -719,11 +719,5 @@ def handle_disconnect():
     except Exception as e:
         logger.error(f"Error handling disconnection: {str(e)}")
 
-if __name__ == '__main__':
-    pyautogui.FAILSAFE = False
-    init_camera()
-    ensure_default_profile()
-    try:
-        socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
-    finally:
-        cleanup()
+# Add this line at the end of the file
+app = socketio.run(app)
