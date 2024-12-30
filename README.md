@@ -54,15 +54,18 @@ Open a web browser and go to http://127.0.0.1:5000/ to start using CursorCam.
 
 To begin using the face tracking system, you need to calibrate by sitting still in front of the camera for a few moments. Calibration ensures that the system tracks your face with precision.
 Once calibrated, the system will track your face and move the mouse cursor based on your facial movements.
-Tracking:
+
+**Tracking**:
 
 Toggle tracking on or off using the interface. When tracking is on, your face movements control the mouse pointer.
 The system allows smooth control with adjustable sensitivity and smoothing settings for comfort.
-User Profiles:
+
+**User Profiles**:
 
 Save your settings as a profile for future use. This allows you to store your calibration data, sensitivity, and other preferences.
 Load and switch between profiles based on different users or preferences.
-Region Locking:
+
+**Region Locking**:
 
 Enable region locking to limit mouse movement to a specific area of your screen. This is useful for users who prefer a restricted movement area.
 
@@ -80,9 +83,11 @@ Enable region locking to limit mouse movement to a specific area of your screen.
 - **DEBUG_MODE**: Enable detailed logging for debugging.
 
 ## Troubleshooting
-**Camera not opening**: Ensure that no other application is using the camera. Restart the application if necessary.
-**Calibration issues**: If calibration fails, ensure you're staying still and not moving too much. The system requires a steady face for accurate calibration.
-**Performance issues**: Lower the camera resolution or frame rate if the application lags on slower systems.
+- **Camera not opening**: Ensure that no other application is using the camera. Restart the application if necessary.
+
+- **Calibration issues**: If calibration fails, ensure you're staying still and not moving too much. The system requires a steady face for accurate calibration.
+
+- **Performance issues**: Lower the camera resolution or frame rate if the application lags on slower systems.
 
 ## 📜License
 This project is licensed under the MIT License - see the LICENSE file for details.
