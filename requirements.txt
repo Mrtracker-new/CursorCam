@@ -1,5 +1,0 @@
-flask
-flask-socketio
-opencv-python
-dlib
-numpy
