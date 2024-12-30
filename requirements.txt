@@ -29,3 +29,11 @@ flask
 flask-socketio
 python-socketio
 eventlet
+flask==2.0.1
+flask-socketio==5.1.1
+python-socketio==5.4.0
+eventlet==0.33.0
+opencv-python-headless==4.5.3.56
+dlib==19.22.0
+numpy==1.21.2
+pyautogui==0.9.53
