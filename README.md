@@ -35,12 +35,12 @@ Run the application:
 
     python app.py
 
-**Usage**
+## Usage
 Position your face in front of the laptop's camera.
 The cursor will follow your facial movements, and you can interact with the screen by looking in different directions.
 Adjust the sensitivity and tracking settings in the configuration file.
 Contributing
 Feel free to fork this repository, submit issues, and create pull requests. Contributions are welcome!
 
-**License**
+## License
 This project is licensed under the MIT License.
