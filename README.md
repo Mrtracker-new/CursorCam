@@ -19,13 +19,13 @@
 
 ### Requirements
 
-- Python 3.x
+- `Python 3.x`
 - `pip`
-- OpenCV
-- dlib
-- pyautogui
-- Flask
-- Flask-SocketIO
+- `OpenCV`
+- `dlib`
+- `pyautogui`
+- `Flask`
+- `Flask-SocketIO`
 
 ### Step-by-Step Installation
 
