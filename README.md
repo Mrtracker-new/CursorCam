@@ -29,11 +29,10 @@
 
 ### Step-by-Step Installation
 
-1. Clone the repository:
+Clone the repository:
 
-   ```bash
-   git clone https://github.com/Mrtracker-new/CursorCam.git
-   cd CursorCam
+    git clone https://github.com/Mrtracker-new/CursorCam.git
+    cd CursorCam
 ### Install dependencies:
 
     pip install -r requirements.txt
