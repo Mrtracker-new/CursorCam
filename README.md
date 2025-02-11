@@ -27,9 +27,9 @@
 - `Flask`
 - `Flask-SocketIO`
 
-### Step-by-Step Installation
+## Step-by-Step Installation
 
-Clone the repository:
+### Clone the repository:
 
     git clone https://github.com/Mrtracker-new/CursorCam.git
     cd CursorCam
