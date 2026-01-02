@@ -1,0 +1,289 @@
+/**
+ * main.js
+ * CursorCam main application - orchestrates all systems
+ */
+
+import { AudioEngine } from './audio/AudioEngine.js';
+import { BeatDetector } from './audio/BeatDetector.js';
+import { NetworkManager } from './constellation/NetworkManager.js';
+import { CanvasRenderer } from './renderer/CanvasRenderer.js';
+import { PerformanceMonitor } from './ui/PerformanceMonitor.js';
+
+// Import patterns
+import { StaticConstellation } from './patterns/StaticConstellation.js';
+import { PulsingMesh } from './patterns/PulsingMesh.js';
+import { PolygonEmergence } from './patterns/PolygonEmergence.js';
+import { StereoSplit } from './patterns/StereoSplit.js';
+import { NeonTunnel } from './patterns/NeonTunnel.js';
+
+/**
+ * Main CursorCam Application
+ */
+class CursorCam {
+    constructor() {
+        // Get canvas
+        this.canvas = document.getElementById('constellation-canvas');
+
+        // Initialize systems
+        this.audioEngine = new AudioEngine();
+        this.beatDetector = new BeatDetector();
+        this.renderer = new CanvasRenderer(this.canvas);
+        this.network = new NetworkManager(this.canvas);
+        this.performanceMonitor = new PerformanceMonitor();
+
+        // Initialize patterns
+        this.patterns = {
+            'static': new StaticConstellation(),
+            'pulsing': new PulsingMesh(),
+            'polygon': new PolygonEmergence(),
+            'stereo': new StereoSplit(),
+            'tunnel': new NeonTunnel()
+        };
+        this.currentPattern = this.patterns['pulsing']; // Default pattern
+
+        // Application state
+        this.isRunning = false;
+        this.audioActive = false;
+
+        // Parameters
+        this.nodeDensity = 500;
+        this.connectionRange = 150;
+        this.colorAggression = 1.0;
+        this.beatSensitivity = 0.6;
+
+        // Setup UI
+        this._setupUI();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.renderer.resize();
+            this.network.canvas = this.canvas;
+            this.network.centerX = this.canvas.width / 2;
+            this.network.centerY = this.canvas.height / 2;
+
+            // Update node canvas bounds
+            for (const node of this.network.nodes) {
+                node.canvasWidth = this.canvas.width;
+                node.canvasHeight = this.canvas.height;
+            }
+        });
+    }
+
+    /**
+     * Setup UI event listeners
+     */
+    _setupUI() {
+        // Permission overlay
+        const permissionOverlay = document.getElementById('permission-overlay');
+        const grantPermissionBtn = document.getElementById('grant-permission');
+
+        grantPermissionBtn.addEventListener('click', async () => {
+            try {
+                await this.audioEngine.initialize();
+                this.audioActive = true;
+
+                // Hide overlay
+                permissionOverlay.classList.add('hidden');
+
+                // Update audio status
+                this._updateAudioStatus(true);
+
+                // Start application
+                this.start();
+            } catch (error) {
+                alert('Failed to access microphone. Please grant permission and try again.');
+                console.error(error);
+            }
+        });
+
+        // Control panel toggle
+        const controlPanel = document.getElementById('control-panel');
+        const panelToggle = document.getElementById('panel-toggle');
+
+        panelToggle.addEventListener('click', () => {
+            controlPanel.classList.toggle('collapsed');
+        });
+
+        // Start audio button
+        const startAudioBtn = document.getElementById('start-audio');
+        startAudioBtn.addEventListener('click', async () => {
+            if (!this.audioActive) {
+                try {
+                    await this.audioEngine.initialize();
+                    this.audioActive = true;
+                    this._updateAudioStatus(true);
+
+                    if (!this.isRunning) {
+                        this.start();
+                    }
+                } catch (error) {
+                    alert('Failed to access microphone.');
+                    console.error(error);
+                }
+            }
+        });
+
+        // Pattern mode selector
+        const patternSelector = document.getElementById('pattern-mode');
+        patternSelector.addEventListener('change', (e) => {
+            this._switchPattern(e.target.value);
+        });
+
+        // Sliders
+        this._setupSlider('node-density', (value) => {
+            this.nodeDensity = value;
+            this.network.setNodeCount(value);
+        });
+
+        this._setupSlider('connection-range', (value) => {
+            this.connectionRange = value;
+            this.network.setConnectionThreshold(value);
+        });
+
+        this._setupSlider('color-aggression', (value) => {
+            this.colorAggression = value;
+            this.renderer.setColorAggression(value);
+        });
+
+        this._setupSlider('beat-sensitivity', (value) => {
+            this.beatSensitivity = value;
+            this.beatDetector.setSensitivity(value);
+        });
+    }
+
+    /**
+     * Setup slider with callback
+     */
+    _setupSlider(id, callback) {
+        const slider = document.getElementById(id);
+        const valueDisplay = document.getElementById(`${id}-value`);
+
+        slider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            valueDisplay.textContent = value;
+            callback(value);
+        });
+    }
+
+    /**
+     * Update audio status indicator
+     */
+    _updateAudioStatus(active) {
+        const statusDot = document.getElementById('audio-status');
+        const statusText = document.getElementById('audio-status-text');
+
+        if (active) {
+            statusDot.classList.add('active');
+            statusText.textContent = 'Audio Active';
+        } else {
+            statusDot.classList.remove('active');
+            statusText.textContent = 'Audio Inactive';
+        }
+    }
+
+    /**
+     * Switch pattern mode
+     */
+    _switchPattern(patternKey) {
+        if (this.patterns[patternKey]) {
+            // Deactivate old pattern
+            if (this.currentPattern.onDeactivate) {
+                this.currentPattern.onDeactivate();
+            }
+
+            // Activate new pattern
+            this.currentPattern = this.patterns[patternKey];
+            if (this.currentPattern.onActivate) {
+                this.currentPattern.onActivate();
+            }
+
+            console.log(`Switched to pattern: ${this.currentPattern.name}`);
+        }
+    }
+
+    /**
+     * Start the application
+     */
+    start() {
+        if (this.isRunning) return;
+
+        console.log('🚀 CursorCam starting...');
+
+        // Initialize network with nodes
+        this.network.initialize(this.nodeDensity);
+
+        // Start render loop
+        this.isRunning = true;
+        this._renderLoop();
+    }
+
+    /**
+     * Main render loop
+     */
+    _renderLoop() {
+        if (!this.isRunning) return;
+
+        // Update performance monitor
+        this.performanceMonitor.update();
+
+        // Get audio data
+        const audioData = this.audioEngine.analyze();
+
+        // Detect beats
+        const beatData = this.beatDetector.detect(audioData);
+
+        // Trigger color rotation on strong beats
+        if (beatData.isBeat && beatData.confidence > 0.7) {
+            this.renderer.rotateColors();
+        }
+
+        // Update pattern
+        this.currentPattern.update(this.network, audioData, beatData);
+
+        // Render pattern
+        this.currentPattern.render(this.renderer, this.network, audioData);
+
+        // Update performance display
+        const stats = this.network.getStats();
+        this.performanceMonitor.display(stats.nodeCount, stats.edgeCount);
+
+        // Auto quality adjustment if performance is low
+        if (this.performanceMonitor.isPerformanceLow()) {
+            const newCount = Math.max(100, this.nodeDensity - 50);
+            if (newCount !== this.nodeDensity) {
+                console.warn('⚠️ Performance degraded, reducing node count');
+                this.nodeDensity = newCount;
+                this.network.setNodeCount(newCount);
+
+                // Update slider
+                const slider = document.getElementById('node-density');
+                const valueDisplay = document.getElementById('node-density-value');
+                slider.value = newCount;
+                valueDisplay.textContent = newCount;
+            }
+        }
+
+        // Continue loop
+        requestAnimationFrame(() => this._renderLoop());
+    }
+
+    /**
+     * Stop the application
+     */
+    stop() {
+        this.isRunning = false;
+        this.audioEngine.destroy();
+        console.log('🛑 CursorCam stopped');
+    }
+}
+
+// Initialize application when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new CursorCam();
+
+    // Make app globally accessible for debugging
+    window.cursorCam = app;
+
+    console.log('%c🎵 CursorCam Ready', 'color: #00ffff; font-size: 20px; font-weight: bold;');
+    console.log('Click "Enable Microphone" to start');
+});

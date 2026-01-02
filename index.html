@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CursorCam - Music-Reactive Constellation Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Main Canvas -->
+    <canvas id="constellation-canvas"></canvas>
+
+    <!-- Performance Monitor -->
+    <div id="performance-monitor">
+        <div class="perf-item">
+            <span class="perf-label">FPS:</span>
+            <span id="fps-value">--</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Frame:</span>
+            <span id="frametime-value">--</span>ms
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Nodes:</span>
+            <span id="node-count">--</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Edges:</span>
+            <span id="edge-count">--</span>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div id="control-panel" class="collapsed">
+        <button id="panel-toggle" class="panel-toggle">⚙️</button>
+
+        <div class="panel-content">
+            <h2>CursorCam Controls</h2>
+
+            <!-- Audio Controls -->
+            <div class="control-section">
+                <h3>Audio</h3>
+                <button id="start-audio" class="primary-btn">Start Audio</button>
+                <div class="status-indicator">
+                    <span class="status-dot" id="audio-status"></span>
+                    <span id="audio-status-text">Audio Inactive</span>
+                </div>
+            </div>
+
+            <!-- Pattern Mode -->
+            <div class="control-section">
+                <h3>Pattern Mode</h3>
+                <select id="pattern-mode" class="mode-selector">
+                    <option value="static">Static Constellation</option>
+                    <option value="pulsing" selected>Pulsing Mesh</option>
+                    <option value="polygon">Polygon Emergence</option>
+                    <option value="stereo">Stereo Split</option>
+                    <option value="tunnel">🌀 Neon Tunnel</option>
+                </select>
+            </div>
+
+            <!-- Sliders -->
+            <div class="control-section">
+                <h3>Parameters</h3>
+
+                <div class="slider-group">
+                    <label for="node-density">
+                        Node Density
+                        <span class="slider-value" id="node-density-value">500</span>
+                    </label>
+                    <input type="range" id="node-density" min="100" max="2000" value="500" step="50">
+                </div>
+
+                <div class="slider-group">
+                    <label for="connection-range">
+                        Connection Range
+                        <span class="slider-value" id="connection-range-value">150</span>px
+                    </label>
+                    <input type="range" id="connection-range" min="50" max="300" value="150" step="10">
+                </div>
+
+                <div class="slider-group">
+                    <label for="color-aggression">
+                        Color Intensity
+                        <span class="slider-value" id="color-aggression-value">1.0</span>x
+                    </label>
+                    <input type="range" id="color-aggression" min="0.5" max="2.0" value="1.0" step="0.1">
+                </div>
+
+                <div class="slider-group">
+                    <label for="beat-sensitivity">
+                        Beat Sensitivity
+                        <span class="slider-value" id="beat-sensitivity-value">0.6</span>
+                    </label>
+                    <input type="range" id="beat-sensitivity" min="0.3" max="1.0" value="0.6" step="0.05">
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="control-section info-section">
+                <p class="info-text">🎵 Play music near your microphone to see the constellation react</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Permission Overlay -->
+    <div id="permission-overlay" class="overlay">
+        <div class="overlay-content">
+            <h1>🎵 CursorCam</h1>
+            <p>Music-Reactive Constellation Engine</p>
+            <button id="grant-permission" class="primary-btn large">Enable Microphone</button>
+            <p class="overlay-hint">Microphone access is required for audio analysis</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

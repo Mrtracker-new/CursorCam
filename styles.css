@@ -1,0 +1,396 @@
+/* ========================================
+   CursorCam - Dark Theme Styling
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Neon Colors */
+    --neon-cyan: #00ffff;
+    --neon-pink: #ff006e;
+    --neon-orange: #ff6b00;
+    --neon-green: #00ff41;
+    --neon-purple: #b400ff;
+    
+    /* UI Colors */
+    --bg-dark: #000000;
+    --panel-bg: rgba(10, 10, 15, 0.85);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(20, 20, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ========================================
+   Canvas
+   ======================================== */
+#constellation-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    z-index: 1;
+}
+
+/* ========================================
+   Performance Monitor
+   ======================================== */
+#performance-monitor {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    z-index: 100;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    gap: 20px;
+}
+
+.perf-item {
+    display: flex;
+    gap: 6px;
+}
+
+.perf-label {
+    color: var(--text-secondary);
+}
+
+#fps-value,
+#frametime-value,
+#node-count,
+#edge-count {
+    color: var(--neon-cyan);
+    font-weight: bold;
+    min-width: 30px;
+}
+
+/* ========================================
+   Control Panel
+   ======================================== */
+#control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    max-width: 320px;
+}
+
+#control-panel.collapsed .panel-content {
+    display: none;
+}
+
+.panel-toggle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 101;
+    padding: 8px;
+    transition: transform 0.2s ease;
+}
+
+.panel-toggle:hover {
+    transform: scale(1.1);
+}
+
+.panel-content {
+    padding: 50px 20px 20px 20px;
+}
+
+.panel-content h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: var(--neon-cyan);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.control-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.control-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.control-section h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+.primary-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.primary-btn.large {
+    padding: 16px 32px;
+    font-size: 16px;
+}
+
+/* ========================================
+   Status Indicator
+   ======================================== */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #666;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.active {
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ========================================
+   Mode Selector
+   ======================================== */
+.mode-selector {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.mode-selector:hover {
+    border-color: var(--neon-cyan);
+}
+
+.mode-selector:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.mode-selector option {
+    background: #1a1a1a;
+    color: var(--text-primary);
+}
+
+/* ========================================
+   Sliders
+   ======================================== */
+.slider-group {
+    margin-bottom: 16px;
+}
+
+.slider-group label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.slider-value {
+    color: var(--neon-cyan);
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: var(--glass-bg);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    transition: transform 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--neon-cyan);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    transition: transform 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* ========================================
+   Info Section
+   ======================================== */
+.info-section {
+    border-bottom: none;
+}
+
+.info-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ========================================
+   Permission Overlay
+   ======================================== */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.overlay-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 40px;
+}
+
+.overlay-content h1 {
+    font-size: 48px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.overlay-content p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: var(--text-secondary);
+}
+
+.overlay-hint {
+    font-size: 13px !important;
+    margin-top: 20px !important;
+    margin-bottom: 0 !important;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 768px) {
+    #performance-monitor {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 11px;
+        top: 10px;
+        left: 10px;
+        padding: 10px 12px;
+    }
+    
+    #control-panel {
+        top: 10px;
+        right: 10px;
+        max-width: 280px;
+    }
+    
+    .panel-content {
+        padding: 45px 16px 16px 16px;
+    }
+}

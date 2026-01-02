@@ -1,0 +1,70 @@
+# Dependencies (if you add any npm packages later)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment variables (API keys, secrets, etc)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build/Distribution (if you add a build step)
+dist/
+build/
+*.min.js
+*.min.css
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Personal notes/experiments
+notes.txt
+TODO.txt
+experiments/
+scratch/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Backup files
+*.bak
+*.backup
+
+# Database files (if you add any local storage)
+*.db
+*.sqlite
+*.sqlite3
+
+# Sensitive personal data
+credentials.json
+secrets.json
+api-keys.json
