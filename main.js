@@ -15,6 +15,7 @@ import { PulsingMesh } from './patterns/PulsingMesh.js';
 import { PolygonEmergence } from './patterns/PolygonEmergence.js';
 import { StereoSplit } from './patterns/StereoSplit.js';
 import { NeonTunnel } from './patterns/NeonTunnel.js';
+import { StrobeDiamondTunnel } from './patterns/StrobeDiamondTunnel.js';
 
 /**
  * Main CursorCam Application
@@ -37,7 +38,8 @@ class CursorCam {
             'pulsing': new PulsingMesh(),
             'polygon': new PolygonEmergence(),
             'stereo': new StereoSplit(),
-            'tunnel': new NeonTunnel()
+            'tunnel': new NeonTunnel(),
+            'diamond-strobe': new StrobeDiamondTunnel()
         };
         this.currentPattern = this.patterns['pulsing']; // Default pattern
 
