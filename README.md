@@ -18,11 +18,12 @@ CursorCam listens to your microphone and creates real-time visuals that react to
 
 **Current Visual Modes:**
 
-1. **🌀 Neon Tunnel** - Fly through an infinite corridor of pulsing geometric frames (NEW!)
-2. **🌐 Static Constellation** - A calm, slowly evolving network of connected nodes
-3. **💓 Pulsing Mesh** - Watch the network breathe with your bass beats
-4. **🔺 Polygon Emergence** - Triangles form and dissolve based on mid frequencies
-5. **🎧 Stereo Split** - Dual-channel visualization for stereo tracks
+1. **💎 Strobe Diamond Tunnel** - Red & white diamond frames with explosive beat-reactive light chunks (NEWEST!)
+2. **🌀 Neon Tunnel** - Fly through an infinite corridor of pulsing geometric frames
+3. **🌐 Static Constellation** - A calm, slowly evolving network of connected nodes
+4. **💓 Pulsing Mesh** - Watch the network breathe with your bass beats
+5. **🔺 Polygon Emergence** - Triangles form and dissolve based on mid frequencies
+6. **🎧 Stereo Split** - Dual-channel visualization for stereo tracks
 
 ---
 
@@ -56,7 +57,7 @@ php -S localhost:8000
 
 5. **Play some music** near your mic and watch the magic happen! ✨
 
-> **Pro Tip:** Try different patterns with different music genres. EDM? Go for the Neon Tunnel. Ambient? Static Constellation is your friend.
+> **Pro Tip:** Try different patterns with different music genres. EDM? Go for the Strobe Diamond Tunnel (it's INTENSE). Ambient? Static Constellation is your friend.
 
 ---
 
@@ -124,7 +125,8 @@ CursorCam/
 │   ├── PulsingMesh.js
 │   ├── PolygonEmergence.js
 │   ├── StereoSplit.js
-│   └── NeonTunnel.js  ← The new kid!
+│   ├── NeonTunnel.js
+│   └── StrobeDiamondTunnel.js  ← The newest kid!
 └── ui/
     └── PerformanceMonitor.js
 ```
@@ -150,7 +152,8 @@ CursorCam/
 
 **Choosing Patterns:**
 - 🎹 Ambient/calm music? → **Static Constellation**
-- 🔊 EDM/electronic? → **Neon Tunnel** or **Pulsing Mesh**
+- 🔊 EDM/electronic/dubstep? → **Strobe Diamond Tunnel** (prepare for visual assault!)
+- 🎵 House/techno? → **Neon Tunnel** or **Pulsing Mesh**
 - 🎸 Rock/complex music? → **Polygon Emergence**
 - 🎧 Stereo tracks? → **Stereo Split**
 
