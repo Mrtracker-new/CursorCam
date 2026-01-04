@@ -12,6 +12,7 @@ export class AudioEngine {
         this.bufferLength = 0;
 
         // Frequency band indices (will be calculated based on FFT size)
+        this.subBassRange = { start: 0, end: 0 };
         this.bassRange = { start: 0, end: 0 };
         this.midRange = { start: 0, end: 0 };
         this.highRange = { start: 0, end: 0 };
@@ -19,6 +20,7 @@ export class AudioEngine {
         // Normalization
         this.energyHistory = [];
         this.historySize = 60; // Keep 60 frames of history
+        this.maxSubBass = 0;
         this.maxBass = 0;
         this.maxMid = 0;
         this.maxHigh = 0;
@@ -45,8 +47,8 @@ export class AudioEngine {
 
             // Create analyser node
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 2048; // Higher resolution for better frequency separation
-            this.analyser.smoothingTimeConstant = 0.7; // Some smoothing for stability
+            this.analyser.fftSize = 4096; // Higher resolution for better frequency separation (especially sub-bass)
+            this.analyser.smoothingTimeConstant = 0.65; // Balanced smoothing for responsiveness
 
             this.bufferLength = this.analyser.frequencyBinCount;
             this.dataArray = new Uint8Array(this.bufferLength);
@@ -76,8 +78,12 @@ export class AudioEngine {
         const nyquist = sampleRate / 2;
         const binSize = nyquist / this.bufferLength;
 
-        // Bass: 20-250 Hz
-        this.bassRange.start = Math.floor(20 / binSize);
+        // Sub-Bass: 20-60 Hz (deep bass impact)
+        this.subBassRange.start = Math.floor(20 / binSize);
+        this.subBassRange.end = Math.floor(60 / binSize);
+
+        // Bass: 60-250 Hz
+        this.bassRange.start = this.subBassRange.end;
         this.bassRange.end = Math.floor(250 / binSize);
 
         // Mid: 250-2000 Hz
@@ -89,9 +95,10 @@ export class AudioEngine {
         this.highRange.end = Math.min(Math.floor(20000 / binSize), this.bufferLength);
 
         console.log('Frequency ranges:', {
-            bass: `${this.bassRange.start}-${this.bassRange.end}`,
-            mid: `${this.midRange.start}-${this.midRange.end}`,
-            high: `${this.highRange.start}-${this.highRange.end}`
+            subBass: `${this.subBassRange.start}-${this.subBassRange.end} (20-60 Hz)`,
+            bass: `${this.bassRange.start}-${this.bassRange.end} (60-250 Hz)`,
+            mid: `${this.midRange.start}-${this.midRange.end} (250-2000 Hz)`,
+            high: `${this.highRange.start}-${this.highRange.end} (2000-20000 Hz)`
         });
     }
 
@@ -101,10 +108,12 @@ export class AudioEngine {
     analyze() {
         if (!this.isActive || !this.analyser) {
             return {
+                subBassEnergy: 0,
                 bassEnergy: 0,
                 midEnergy: 0,
                 highEnergy: 0,
                 totalEnergy: 0,
+                loudness: 0,
                 spectrum: null
             };
         }
@@ -113,26 +122,34 @@ export class AudioEngine {
         this.analyser.getByteFrequencyData(this.dataArray);
 
         // Calculate energy for each frequency band
+        const subBassEnergy = this._calculateBandEnergy(this.subBassRange.start, this.subBassRange.end);
         const bassEnergy = this._calculateBandEnergy(this.bassRange.start, this.bassRange.end);
         const midEnergy = this._calculateBandEnergy(this.midRange.start, this.midRange.end);
         const highEnergy = this._calculateBandEnergy(this.highRange.start, this.highRange.end);
 
-        // Calculate total energy
-        const totalEnergy = (bassEnergy + midEnergy + highEnergy) / 3;
+        // Calculate total energy (weighted average)
+        const totalEnergy = (subBassEnergy + bassEnergy + midEnergy + highEnergy) / 4;
+
+        // Calculate overall loudness (across entire spectrum)
+        const loudness = this._calculateBandEnergy(0, this.bufferLength);
 
         // Update normalization values
-        this._updateNormalization(bassEnergy, midEnergy, highEnergy);
+        this._updateNormalization(subBassEnergy, bassEnergy, midEnergy, highEnergy);
 
         // Normalize to 0-1 range
+        const normalizedSubBass = this.maxSubBass > 0 ? Math.min(subBassEnergy / this.maxSubBass, 1) : 0;
         const normalizedBass = this.maxBass > 0 ? Math.min(bassEnergy / this.maxBass, 1) : 0;
         const normalizedMid = this.maxMid > 0 ? Math.min(midEnergy / this.maxMid, 1) : 0;
         const normalizedHigh = this.maxHigh > 0 ? Math.min(highEnergy / this.maxHigh, 1) : 0;
+        const normalizedLoudness = loudness / 255; // Simple normalization for loudness
 
         return {
+            subBassEnergy: normalizedSubBass,
             bassEnergy: normalizedBass,
             midEnergy: normalizedMid,
             highEnergy: normalizedHigh,
-            totalEnergy: (normalizedBass + normalizedMid + normalizedHigh) / 3,
+            totalEnergy: (normalizedSubBass + normalizedBass + normalizedMid + normalizedHigh) / 4,
+            loudness: normalizedLoudness,
             spectrum: this.dataArray // Raw spectrum for advanced use
         };
     }
@@ -155,15 +172,17 @@ export class AudioEngine {
     /**
      * Update normalization values using exponential moving average
      */
-    _updateNormalization(bass, mid, high) {
+    _updateNormalization(subBass, bass, mid, high) {
         const alpha = 0.05; // Smoothing factor
 
         // Update max values with decay
+        this.maxSubBass = Math.max(subBass, this.maxSubBass * 0.995);
         this.maxBass = Math.max(bass, this.maxBass * 0.995);
         this.maxMid = Math.max(mid, this.maxMid * 0.995);
         this.maxHigh = Math.max(high, this.maxHigh * 0.995);
 
         // Ensure minimums to prevent division by zero
+        this.maxSubBass = Math.max(this.maxSubBass, 10);
         this.maxBass = Math.max(this.maxBass, 10);
         this.maxMid = Math.max(this.maxMid, 10);
         this.maxHigh = Math.max(this.maxHigh, 10);

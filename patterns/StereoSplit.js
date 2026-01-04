@@ -15,8 +15,12 @@ export class StereoSplit extends PatternBase {
     update(network, audioData, beatData) {
         // For now, simulate stereo by using different frequency bands
         // Left = bass + mid, Right = mid + high
-        this.leftEnergy = (audioData.bassEnergy + audioData.midEnergy) / 2;
-        this.rightEnergy = (audioData.midEnergy + audioData.highEnergy) / 2;
+        const bassValue = audioData.bass || audioData.bassEnergy || 0;
+        const midValue = audioData.mids || audioData.midEnergy || 0;
+        const highValue = audioData.highs || audioData.highEnergy || 0;
+
+        this.leftEnergy = (bassValue + midValue) / 2;
+        this.rightEnergy = (midValue + highValue) / 2;
 
         // Update network nodes with stereo-based colors
         const centerX = network.canvas.width / 2;

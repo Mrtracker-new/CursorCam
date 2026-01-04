@@ -13,10 +13,16 @@ export class PolygonEmergence extends PatternBase {
     }
 
     update(network, audioData, beatData) {
+        // Geometric Mode Audio Mapping:
+        // Bass → polygon scale & thickness
+        // Mids → polygon morphing (formation probability)
+        // Highs → edge glow & particle spawning
+        // Transients → sharp geometric shifts
+
         // Standard network update
         network.update(audioData, beatData);
 
-        // Find triangles in network
+        // Find triangles in network with audio-reactive parameters
         this.triangles = this._findTriangles(network, audioData);
     }
 
@@ -25,12 +31,20 @@ export class PolygonEmergence extends PatternBase {
      */
     _findTriangles(network, audioData) {
         const triangles = [];
-        const threshold = network.connectionThreshold + (audioData.midEnergy * 100);
 
-        // Formation probability based on mid frequencies
-        const formationProb = audioData.midEnergy * 0.7;
+        // Use new audio property names with fallbacks
+        const midValue = audioData.mids || audioData.midEnergy || 0;
+        const highValue = audioData.highs || audioData.highEnergy || 0;
 
-        if (Math.random() > formationProb) {
+        const threshold = network.connectionThreshold + (midValue * 100);
+
+        // Formation probability based on mid frequencies (polygon morphing)
+        const formationProb = midValue * 0.7;
+
+        // During high frequencies, increase formation rate (edge glow effect)
+        const highBoost = highValue * 0.3;
+
+        if (Math.random() > (formationProb + highBoost)) {
             return []; // Skip this frame
         }
 

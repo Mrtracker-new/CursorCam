@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CursorCam - Music-Reactive Constellation Engine</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 
 <body>
@@ -53,12 +63,16 @@
             <div class="control-section">
                 <h3>Pattern Mode</h3>
                 <select id="pattern-mode" class="mode-selector">
-                    <option value="static">Static Constellation</option>
-                    <option value="pulsing" selected>Pulsing Mesh</option>
-                    <option value="polygon">Polygon Emergence</option>
-                    <option value="stereo">Stereo Split</option>
+                    <option value="static">🧘 Minimal Calm</option>
+                    <option value="pulsing" selected>💓 Pulsing Mesh</option>
+                    <option value="polygon">🔷 Polygon Emergence</option>
+                    <option value="stereo">🎵 Stereo Split</option>
                     <option value="tunnel">🌀 Neon Tunnel</option>
-                    <option value="diamond-strobe">💎 Strobe Diamond Tunnel</option>
+                    <option value="diamond-strobe">💎 Strobe Diamond</option>
+                    <option value="hyperspace">🚀 Hyperspace Tunnel</option>
+                    <option value="waveform">📊 Waveform Spectrum</option>
+                    <option value="particles">✨ Particle Energy</option>
+                    <option value="aggressive">⚡ Aggressive Cyber</option>
                 </select>
             </div>
 

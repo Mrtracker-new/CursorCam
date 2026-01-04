@@ -44,10 +44,62 @@ export class ColorSystem {
     }
 
     /**
-     * Get color based on frequency dominance
+     * Get color based on audio state (intelligent audio-reactive color selection)
+     * Bass → warm colors, Highs → cool colors, Energy → saturation
+     */
+    getColorForAudioState(audioData) {
+        const { bass, mids, highs, totalEnergy, isSilence } = audioData;
+
+        // During silence, return desaturated color
+        if (isSilence) {
+            return { r: 100, g: 100, b: 120 }; // Muted blue-gray
+        }
+
+        // Calculate color temperature (bass=warm, highs=cool)
+        const warmth = bass / (bass + highs + 0.01); // 0=cool, 1=warm
+        const coolness = highs / (bass + highs + 0.01); // 0=warm, 1=cool
+
+        // Base color selection
+        let baseColor;
+        if (warmth > 0.6) {
+            // Bass-dominant: warm colors (red, orange, yellow)
+            const palette = this.palettes.bass;
+            const index = Math.floor(bass * (palette.length - 1));
+            baseColor = palette[Math.min(index, palette.length - 1)];
+        } else if (coolness > 0.6) {
+            // High-dominant: cool colors (cyan, blue, white)
+            const palette = this.palettes.high;
+            const index = Math.floor(highs * (palette.length - 1));
+            baseColor = palette[Math.min(index, palette.length - 1)];
+        } else {
+            // Mid-dominant: green colors
+            const palette = this.palettes.mid;
+            const index = Math.floor(mids * (palette.length - 1));
+            baseColor = palette[Math.min(index, palette.length - 1)];
+        }
+
+        // Apply energy-based saturation boost
+        const saturationBoost = 0.7 + (totalEnergy * 0.3); // 0.7x to 1.0x
+
+        return {
+            r: Math.min(255, baseColor[0] * saturationBoost * this.colorAggression),
+            g: Math.min(255, baseColor[1] * saturationBoost * this.colorAggression),
+            b: Math.min(255, baseColor[2] * saturationBoost * this.colorAggression)
+        };
+    }
+
+    /**
+     * Get color based on frequency dominance (LEGACY - kept for compatibility)
      */
     getColorForFrequency(audioData) {
-        const { bassEnergy, midEnergy, highEnergy } = audioData;
+        // Map new property names to old ones if needed
+        const mappedData = {
+            bassEnergy: audioData.bass || audioData.bassEnergy || 0,
+            midEnergy: audioData.mids || audioData.midEnergy || 0,
+            highEnergy: audioData.highs || audioData.highEnergy || 0
+        };
+
+        const { bassEnergy, midEnergy, highEnergy } = mappedData;
 
         // Determine dominant frequency
         let palette;

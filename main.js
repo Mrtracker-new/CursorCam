@@ -5,6 +5,7 @@
 
 import { AudioEngine } from './audio/AudioEngine.js';
 import { BeatDetector } from './audio/BeatDetector.js';
+import { AudioIntelligence } from './audio/AudioIntelligence.js';
 import { NetworkManager } from './constellation/NetworkManager.js';
 import { CanvasRenderer } from './renderer/CanvasRenderer.js';
 import { PerformanceMonitor } from './ui/PerformanceMonitor.js';
@@ -16,6 +17,10 @@ import { PolygonEmergence } from './patterns/PolygonEmergence.js';
 import { StereoSplit } from './patterns/StereoSplit.js';
 import { NeonTunnel } from './patterns/NeonTunnel.js';
 import { StrobeDiamondTunnel } from './patterns/StrobeDiamondTunnel.js';
+import { HyperspaceTunnel } from './patterns/HyperspaceTunnel.js';
+import { WaveformSpectrum } from './patterns/WaveformSpectrum.js';
+import { ParticleEnergy } from './patterns/ParticleEnergy.js';
+import { AggressiveCyber } from './patterns/AggressiveCyber.js';
 
 /**
  * Main CursorCam Application
@@ -28,6 +33,7 @@ class CursorCam {
         // Initialize systems
         this.audioEngine = new AudioEngine();
         this.beatDetector = new BeatDetector();
+        this.audioIntelligence = new AudioIntelligence(this.audioEngine, this.beatDetector);
         this.renderer = new CanvasRenderer(this.canvas);
         this.network = new NetworkManager(this.canvas);
         this.performanceMonitor = new PerformanceMonitor();
@@ -39,7 +45,11 @@ class CursorCam {
             'polygon': new PolygonEmergence(),
             'stereo': new StereoSplit(),
             'tunnel': new NeonTunnel(),
-            'diamond-strobe': new StrobeDiamondTunnel()
+            'diamond-strobe': new StrobeDiamondTunnel(),
+            'hyperspace': new HyperspaceTunnel(),
+            'waveform': new WaveformSpectrum(),
+            'particles': new ParticleEnergy(),
+            'aggressive': new AggressiveCyber()
         };
         this.currentPattern = this.patterns['pulsing']; // Default pattern
 
@@ -228,18 +238,20 @@ class CursorCam {
         // Update performance monitor
         this.performanceMonitor.update();
 
-        // Get audio data
-        const audioData = this.audioEngine.analyze();
-
-        // Detect beats
-        const beatData = this.beatDetector.detect(audioData);
+        // Get unified audio intelligence
+        const audioData = this.audioIntelligence.analyze();
 
         // Trigger color rotation on strong beats
-        if (beatData.isBeat && beatData.confidence > 0.7) {
+        if (audioData.isBeat && audioData.beatStrength >= 2) {
             this.renderer.rotateColors();
         }
 
-        // Update pattern
+        // Update pattern (pass both audioData and legacy beatData for compatibility)
+        const beatData = {
+            isBeat: audioData.isBeat,
+            confidence: audioData.beatConfidence,
+            energy: audioData.totalEnergy
+        };
         this.currentPattern.update(this.network, audioData, beatData);
 
         // Render pattern
