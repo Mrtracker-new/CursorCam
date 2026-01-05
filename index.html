@@ -73,6 +73,7 @@
                     <option value="waveform">📊 Waveform Spectrum</option>
                     <option value="particles">✨ Particle Energy</option>
                     <option value="aggressive">⚡ Aggressive Cyber</option>
+                    <option value="cyberpunk">🌆 Cyberpunk Mode</option>
                 </select>
             </div>
 
@@ -110,6 +111,40 @@
                         <span class="slider-value" id="beat-sensitivity-value">0.6</span>
                     </label>
                     <input type="range" id="beat-sensitivity" min="0.3" max="1.0" value="0.6" step="0.05">
+                </div>
+            </div>
+
+            <!-- Cyberpunk Mode Controls (hidden by default) -->
+            <div id="cyberpunk-controls" class="control-section cyberpunk-section" style="display:none;">
+                <h3>⚡ Cyberpunk Settings</h3>
+                
+                <div class="slider-group">
+                    <label for="lightning-intensity">
+                        Lightning Intensity
+                        <span class="slider-value" id="lightning-intensity-value">1.0</span>x
+                    </label>
+                    <input type="range" id="lightning-intensity" min="0" max="2" value="1.0" step="0.1">
+                </div>
+
+                <div class="slider-group">
+                    <label for="particle-density">
+                        Particle Density
+                        <span class="slider-value" id="particle-density-value">1.0</span>x
+                    </label>
+                    <input type="range" id="particle-density" min="0.2" max="2" value="1.0" step="0.1">
+                </div>
+
+                <div class="slider-group">
+                    <label for="cyberpunk-mode-override">
+                        Mode Override
+                    </label>
+                    <select id="cyberpunk-mode-override" class="mode-selector">
+                        <option value="auto" selected>🎵 Auto (Reactive)</option>
+                        <option value="overdrive">⚡ Overdrive</option>
+                        <option value="core">🔥 Core</option>
+                        <option value="glitch">🧊 Glitch</option>
+                        <option value="portal">🌀 Portal</option>
+                    </select>
                 </div>
             </div>
 
