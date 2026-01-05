@@ -20,7 +20,7 @@ import { StrobeDiamondTunnel } from './patterns/StrobeDiamondTunnel.js';
 import { HyperspaceTunnel } from './patterns/HyperspaceTunnel.js';
 import { WaveformSpectrum } from './patterns/WaveformSpectrum.js';
 import { ParticleEnergy } from './patterns/ParticleEnergy.js';
-import { AggressiveCyber } from './patterns/AggressiveCyber.js';
+import { CyberpunkMode } from './patterns/CyberpunkMode.js';
 
 /**
  * Main CursorCam Application
@@ -49,7 +49,7 @@ class CursorCam {
             'hyperspace': new HyperspaceTunnel(),
             'waveform': new WaveformSpectrum(),
             'particles': new ParticleEnergy(),
-            'aggressive': new AggressiveCyber()
+            'cyberpunk': new CyberpunkMode()
         };
         this.currentPattern = this.patterns['pulsing']; // Default pattern
 
@@ -161,6 +161,15 @@ class CursorCam {
             this.beatSensitivity = value;
             this.beatDetector.setSensitivity(value);
         });
+
+        // Cyberpunk-specific controls
+        this._setupSlider('lightning-intensity', (value) => {
+            // Value is read directly by CyberpunkMode
+        });
+
+        this._setupSlider('particle-density', (value) => {
+            // Value is read directly by CyberpunkMode
+        });
     }
 
     /**
@@ -210,6 +219,16 @@ class CursorCam {
             }
 
             console.log(`Switched to pattern: ${this.currentPattern.name}`);
+
+            // Show/hide cyberpunk controls
+            const cyberpunkControls = document.getElementById('cyberpunk-controls');
+            if (cyberpunkControls) {
+                if (patternKey === 'cyberpunk') {
+                    cyberpunkControls.style.display = 'block';
+                } else {
+                    cyberpunkControls.style.display = 'none';
+                }
+            }
         }
     }
 
