@@ -18,6 +18,23 @@ export class AudioIntelligence {
         this.energyTrend = [];
         this.trendSize = 120; // ~2 seconds at 60fps
         this.climaxThreshold = 0.7; // Energy growth rate for climax
+
+        // CYBERPUNK ENHANCEMENTS
+        // Beat drop detection (energy falling after sustained high)
+        this.energyHistory = [];
+        this.energyHistorySize = 30; // ~0.5 seconds at 60fps
+        this.lastHighEnergyTime = 0;
+        this.beatDropThreshold = 0.4; // Energy drop magnitude
+
+        // High-frequency spike detection (for lightning triggers)
+        this.highFreqHistory = [];
+        this.highFreqHistorySize = 10; // Short window for transient detection
+        this.spikeThreshold = 0.3; // Increase from baseline
+
+        // Energy state tracking (for mode determination)
+        this.currentEnergyState = 'CORE';
+        this.stateChangeFrames = 0;
+        this.stateStabilityRequired = 20; // Frames before state change
     }
 
     /**
@@ -43,6 +60,16 @@ export class AudioIntelligence {
         // Detect climax (energy build-up)
         const isClimax = this._detectClimax(audioData.totalEnergy);
 
+        // CYBERPUNK ENHANCEMENTS
+        // Detect beat drop (energy falling after sustained high)
+        const beatDrop = this._detectBeatDrop(audioData.totalEnergy);
+
+        // Detect high-frequency spike (for lightning triggers)
+        const highSpike = this._detectHighSpike(audioData.highEnergy);
+
+        // Determine energy state (OVERDRIVE/CORE/GLITCH/PORTAL)
+        const energyState = this._getEnergyState(audioData);
+
         // Build unified data structure
         return {
             // Frequency bands (normalized 0-1)
@@ -64,6 +91,12 @@ export class AudioIntelligence {
             isTransient: beatData.isTransient || false,
             isSilence: isSilence,
             isClimax: isClimax,
+
+            // CYBERPUNK SPECIFIC
+            isBeatDrop: beatDrop.isDrop,
+            beatDropIntensity: beatDrop.intensity,
+            highSpikeIntensity: highSpike,
+            energyState: energyState, // 'OVERDRIVE' | 'CORE' | 'GLITCH' | 'PORTAL'
 
             // Smoothed values (EMA)
             smoothBass: smoothedEnergy.bass,
@@ -138,5 +171,109 @@ export class AudioIntelligence {
      */
     setClimaxSensitivity(sensitivity) {
         this.climaxThreshold = Math.max(0.3, Math.min(1.0, sensitivity));
+    }
+
+    /**
+     * CYBERPUNK: Detect beat drop (energy falling after sustained high)
+     * @returns {Object} { isDrop: boolean, intensity: number }
+     */
+    _detectBeatDrop(totalEnergy) {
+        // Add to energy history
+        this.energyHistory.push(totalEnergy);
+        if (this.energyHistory.length > this.energyHistorySize) {
+            this.energyHistory.shift();
+        }
+
+        // Need enough history
+        if (this.energyHistory.length < this.energyHistorySize) {
+            return { isDrop: false, intensity: 0 };
+        }
+
+        // Calculate recent average and current trend
+        const recentAvg = this.energyHistory.slice(-10).reduce((a, b) => a + b, 0) / 10;
+        const olderAvg = this.energyHistory.slice(0, 10).reduce((a, b) => a + b, 0) / 10;
+
+        // Check if we had high energy recently
+        const hadHighEnergy = olderAvg > 0.6;
+
+        // Check if energy dropped significantly
+        const dropMagnitude = olderAvg - recentAvg;
+        const isDrop = hadHighEnergy && dropMagnitude > this.beatDropThreshold;
+
+        return {
+            isDrop: isDrop,
+            intensity: isDrop ? Math.min(dropMagnitude, 1.0) : 0
+        };
+    }
+
+    /**
+     * CYBERPUNK: Detect high-frequency spike (for lightning triggers)
+     * @param {number} highEnergy - Current high-frequency energy (0-1)
+     * @returns {number} Spike intensity (0-1), 0 if no spike
+     */
+    _detectHighSpike(highEnergy) {
+        // Add to history
+        this.highFreqHistory.push(highEnergy);
+        if (this.highFreqHistory.length > this.highFreqHistorySize) {
+            this.highFreqHistory.shift();
+        }
+
+        // Need enough history
+        if (this.highFreqHistory.length < 5) {
+            return 0;
+        }
+
+        // Calculate baseline (average of older samples)
+        const baseline = this.highFreqHistory.slice(0, -3).reduce((a, b) => a + b, 0) / (this.highFreqHistory.length - 3);
+
+        // Check if current energy is significantly higher than baseline
+        const spike = highEnergy - baseline;
+
+        if (spike > this.spikeThreshold) {
+            return Math.min(spike / 0.7, 1.0); // Normalize to 0-1
+        }
+
+        return 0;
+    }
+
+    /**
+     * CYBERPUNK: Determine energy state for pattern mode
+     * @param {Object} audioData - Audio analysis data
+     * @returns {string} 'OVERDRIVE' | 'CORE' | 'GLITCH' | 'PORTAL'
+     */
+    _getEnergyState(audioData) {
+        let targetState = 'CORE'; // Default
+
+        // OVERDRIVE: Sustained high bass + total energy > 0.8
+        if (audioData.bassEnergy > 0.7 && audioData.totalEnergy > 0.8) {
+            targetState = 'OVERDRIVE';
+        }
+        // GLITCH: High-frequency dominance
+        else if (audioData.highEnergy > 0.7 && audioData.highEnergy > audioData.bassEnergy) {
+            targetState = 'GLITCH';
+        }
+        // PORTAL: Triggered by beat drop (handled separately, but check here too)
+        else if (audioData.totalEnergy < 0.2 && this.energyHistory.length > 0) {
+            // Check if we just had high energy
+            const recentHigh = this.energyHistory.slice(-20).some(e => e > 0.6);
+            if (recentHigh) {
+                targetState = 'PORTAL';
+            }
+        }
+
+        // State stability: only change state if target is sustained
+        if (targetState === this.currentEnergyState) {
+            this.stateChangeFrames = 0;
+        } else {
+            this.stateChangeFrames++;
+
+            // Only change state after it's been stable for required frames
+            if (this.stateChangeFrames >= this.stateStabilityRequired) {
+                this.currentEnergyState = targetState;
+                this.stateChangeFrames = 0;
+            }
+        }
+
+        return this.currentEnergyState;
     }
 }
