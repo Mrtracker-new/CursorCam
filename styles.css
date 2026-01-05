@@ -15,14 +15,14 @@
     --neon-orange: #ff6b00;
     --neon-green: #00ff41;
     --neon-purple: #b400ff;
-    
+
     /* UI Colors */
     --bg-dark: #000000;
     --panel-bg: rgba(10, 10, 15, 0.85);
     --panel-border: rgba(255, 255, 255, 0.1);
     --text-primary: #ffffff;
     --text-secondary: #aaaaaa;
-    
+
     /* Glassmorphism */
     --glass-bg: rgba(20, 20, 30, 0.7);
     --glass-border: rgba(255, 255, 255, 0.15);
@@ -213,8 +213,15 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* ========================================
@@ -324,6 +331,73 @@ input[type="range"]::-moz-range-thumb:hover {
 }
 
 /* ========================================
+   Cyberpunk Mode Controls
+   ======================================== */
+.cyberpunk-section {
+    border: 2px solid var(--neon-cyan);
+    border-radius: 8px;
+    padding: 16px;
+    background: rgba(0, 255, 255, 0.03);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    position: relative;
+}
+
+.cyberpunk-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.cyberpunk-section h3 {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    font-family: 'Courier New', monospace;
+    position: relative;
+    z-index: 1;
+}
+
+.cyberpunk-section label {
+    color: var(--neon-cyan);
+    font-family: 'Courier New', monospace;
+    position: relative;
+    z-index: 1;
+}
+
+.cyberpunk-section .slider-value {
+    color: #FF00FF;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+}
+
+.cyberpunk-section input[type="range"]::-webkit-slider-thumb {
+    background: #FF00FF;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+}
+
+.cyberpunk-section input[type="range"]::-moz-range-thumb {
+    background: #FF00FF;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+}
+
+.cyberpunk-section select {
+    background: #000;
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    font-family: 'Courier New', monospace;
+}
+
+.cyberpunk-section select option {
+    background: #000;
+    color: var(--neon-cyan);
+}
+
+/* ========================================
    Permission Overlay
    ======================================== */
 .overlay {
@@ -383,13 +457,13 @@ input[type="range"]::-moz-range-thumb:hover {
         left: 10px;
         padding: 10px 12px;
     }
-    
+
     #control-panel {
         top: 10px;
         right: 10px;
         max-width: 280px;
     }
-    
+
     .panel-content {
         padding: 45px 16px 16px 16px;
     }
