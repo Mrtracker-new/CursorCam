@@ -29,7 +29,7 @@ CursorCam transforms audio into mesmerizing visual art in real-time. Think of it
 - **Hyperspace Tunnel** - Full 3D with wireframes & particles (21 FPS of pure art)
 
 **Maximum Intensity** ⚡
-- **Aggressive Cyber** - Camera shake, glitch effects, scan lines. Your bass drops deserve this.
+- **Cyberpunk Mode** - Full 3D reactive system with neon geometry, lightning bolts, particle bursts, and dynamic state management. Pure cyberpunk energy.
 
 ## �️ Audio Intelligence
 
