@@ -14,26 +14,30 @@ CursorCam transforms audio into mesmerizing visual art in real-time. Think of it
 ## 🎨 The Visual Modes
 
 **Chill Vibes** 🧘
+
 - **Minimal Calm** - For when you're meditating or pretending to
 - **Pulsing Mesh** - Your heartbeat, but cooler
 - **Polygon Emergence** - Sacred geometry energy
 
 **Classic DJ Tools** 🎵
+
 - **Waveform Spectrum** - The OG frequency bars (64 of them!)
 - **Stereo Split** - Left ear vs right ear, visualized
 - **Particle Energy** - 300 glowing particles with trail effects ✨
 
 **Tunnel Vision** 🌀
+
 - **Neon Tunnel** - Fast & fluid
 - **Strobe Diamond** - VJ-ready geometric madness
 - **Hyperspace Tunnel** - Full 3D with wireframes & particles (21 FPS of pure art)
 
 **Maximum Intensity** ⚡
+
 - **Cyberpunk Mode** - Full 3D reactive system with neon geometry, lightning bolts, particle bursts, and dynamic state management. Pure cyberpunk energy.
 
 ## �️ Audio Intelligence
 
-We don't just listen to your music, we *understand* it:
+We don't just listen to your music, we _understand_ it:
 
 - **Sub-bass** (20-60 Hz) - For those earth-shaking drops
 - **Bass** (60-250 Hz) - The heartbeat of your track
@@ -44,20 +48,70 @@ Plus: beat detection, transient detection (for snares & hi-hats), silence detect
 
 ## 🚀 Quick Start
 
+**Option 1: Run Locally** (Recommended for development)
+
 ```bash
 # Clone this bad boy
 git clone https://github.com/Mrtracker-new/CursorCam.git
-
-# Fire up a server (Python example)
 cd CursorCam
-python -m http.server 8000
 
-# Open browser
-# Navigate to http://localhost:8000
+# Install dependencies
+npm install
+
+# Start development server with hot reload
+npm run dev
+
+# Open browser to http://localhost:3000
 # Click "Enable Microphone"
 # Play some music
 # Watch the magic happen ✨
 ```
+
+**Option 2: Simple HTTP Server** (No build needed)
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Node.js
+npx serve
+
+# Open http://localhost:8000
+```
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+### Setup
+
+```bash
+npm install         # Install dependencies
+npm run dev         # Start dev server (http://localhost:3000)
+npm run build       # Build for production
+npm run preview     # Preview production build
+```
+
+### Code Quality
+
+```bash
+npm run lint        # Check code quality
+npm run lint:fix    # Auto-fix issues
+npm run format      # Format code with Prettier
+```
+
+### Testing
+
+```bash
+npm test            # Run tests in watch mode
+npm run test:ui     # Open Vitest UI
+npm run test:coverage  # Generate coverage report
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ## �️ Controls
 
@@ -72,6 +126,7 @@ python -m http.server 8000
 ## � Color Intelligence
 
 Colors react to frequencies:
+
 - **Bass** → Warm (reds, oranges, yellows) 🔥
 - **Highs** → Cool (cyans, blues, whites) ❄️
 - **Silence** → Desaturated (we get the mood)
@@ -103,12 +158,14 @@ No random color cycling here. Every color change is musically justified.
 ## 🧠 The Nerdy Stuff
 
 **Audio Analysis**:
+
 - 4096-point FFT for frequency separation
 - Exponential Moving Average (EMA) for smooth transitions
 - Adaptive beat threshold (learns your music's dynamics)
 - Peak memory tracking (we remember the good parts)
 
 **Visual Engine**:
+
 - Up to 2000 nodes (auto-optimized)
 - 300 particles in Particle Energy mode
 - Bloom effects on 3D tunnels
