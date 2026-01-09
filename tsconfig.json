@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    // Language & Environment
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    // Module Resolution
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    // Type Checking
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    // Emit
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    // Skip type checking of node_modules
+    "skipLibCheck": true,
+    // Path aliases (matching vite.config.js)
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@audio/*": ["audio/*"],
+      "@patterns/*": ["patterns/*"],
+      "@constellation/*": ["constellation/*"],
+      "@renderer/*": ["renderer/*"],
+      "@ui/*": ["ui/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "**/*.test.js", "**/*.test.ts"]
+}
