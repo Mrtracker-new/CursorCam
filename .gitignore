@@ -1,27 +1,47 @@
-# Dependencies (if you add any npm packages later)
+# Dependencies
 node_modules/
-package-lock.json
+.pnp
+.pnp.js
+
+# Lock files (keep package-lock.json for consistency)
+# package-lock.json is NOT ignored - we want it in version control
 yarn.lock
 pnpm-lock.yaml
 
-# Environment variables (API keys, secrets, etc)
+# Environment variables
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*.local
 *.env
 
 # Editor/IDE files
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
 *.sublime-*
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
 
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 
 # Logs
 *.log
@@ -29,42 +49,110 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
 
-# Build/Distribution (if you add a build step)
+# Build output (Vite)
 dist/
+dist-ssr/
 build/
+*.local
+
+# Minified files
 *.min.js
 *.min.css
+
+# Cache directories
+.cache/
+.parcel-cache/
+.vite/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
 # Temporary files
 tmp/
 temp/
 *.tmp
+*.temp
 
 # Personal notes/experiments
 notes.txt
 TODO.txt
+todo.md
 experiments/
 scratch/
-
-# Cache
-.cache/
-.parcel-cache/
-
-# Testing
-coverage/
-.nyc_output/
+docs_ignore/
 
 # Backup files
 *.bak
 *.backup
+*.old
+*.orig
 
-# Database files (if you add any local storage)
+# Database files
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 
-# Sensitive personal data
+# Sensitive data
 credentials.json
 secrets.json
 api-keys.json
+.env.secret
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Misc
+.vercel
+.turbo
+.netlify
