@@ -1,0 +1,51 @@
+{
+  "name": "cursorcam",
+  "version": "2.0.0",
+  "description": "Music-Reactive Visual Engine - Transform audio into mesmerizing visual art in real-time",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\""
+  },
+  "keywords": [
+    "audio",
+    "visualization",
+    "music",
+    "reactive",
+    "canvas",
+    "webgl",
+    "threejs",
+    "beat-detection",
+    "fft"
+  ],
+  "author": "Rolan Lobo <https://github.com/Mrtracker-new>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mrtracker-new/CursorCam.git"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/three": "^0.159.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "globals": "^15.13.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  },
+  "dependencies": {
+    "three": "^0.159.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
