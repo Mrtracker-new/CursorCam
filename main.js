@@ -170,6 +170,16 @@ class CursorCam {
     this._setupSlider('particle-density', (value) => {
       // Value is read directly by CyberpunkMode
     });
+
+    // Waveform mode switcher
+    const waveformModeSelector = document.getElementById('waveform-mode');
+    if (waveformModeSelector) {
+      waveformModeSelector.addEventListener('change', (e) => {
+        if (this.patterns.waveform && this.patterns.waveform.setMode) {
+          this.patterns.waveform.setMode(e.target.value);
+        }
+      });
+    }
   }
 
   /**
@@ -227,6 +237,16 @@ class CursorCam {
           cyberpunkControls.style.display = 'block';
         } else {
           cyberpunkControls.style.display = 'none';
+        }
+      }
+
+      // Show/hide waveform controls
+      const waveformControls = document.getElementById('waveform-controls');
+      if (waveformControls) {
+        if (patternKey === 'waveform') {
+          waveformControls.style.display = 'block';
+        } else {
+          waveformControls.style.display = 'none';
         }
       }
     }
