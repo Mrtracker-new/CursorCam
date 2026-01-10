@@ -180,6 +180,16 @@ class CursorCam {
         }
       });
     }
+
+    // Particle behavior switcher
+    const particleBehaviorSelector = document.getElementById('particle-behavior');
+    if (particleBehaviorSelector) {
+      particleBehaviorSelector.addEventListener('change', (e) => {
+        if (this.patterns.particles && this.patterns.particles.setMode) {
+          this.patterns.particles.setMode(e.target.value);
+        }
+      });
+    }
   }
 
   /**
@@ -247,6 +257,16 @@ class CursorCam {
           waveformControls.style.display = 'block';
         } else {
           waveformControls.style.display = 'none';
+        }
+      }
+
+      // Show/hide particle controls
+      const particleControls = document.getElementById('particle-controls');
+      if (particleControls) {
+        if (patternKey === 'particles') {
+          particleControls.style.display = 'block';
+        } else {
+          particleControls.style.display = 'none';
         }
       }
     }
