@@ -106,7 +106,7 @@
             <!-- Cyberpunk Mode Controls (hidden by default) -->
             <div id="cyberpunk-controls" class="control-section cyberpunk-section" style="display:none;">
                 <h3>⚡ Cyberpunk Settings</h3>
-                
+
                 <div class="slider-group">
                     <label for="lightning-intensity">
                         Lightning Intensity
@@ -140,7 +140,7 @@
             <!-- Waveform Mode Controls (hidden by default) -->
             <div id="waveform-controls" class="control-section waveform-section" style="display:none;">
                 <h3>📊 Waveform Settings</h3>
-                
+
                 <div class="slider-group">
                     <label for="waveform-mode">Visualization Mode</label>
                     <select id="waveform-mode" class="mode-selector">
@@ -152,12 +152,30 @@
                     </select>
                 </div>
             </div>
+        </div>
 
-            <!-- Info -->
-            <div class="control-section info-section">
-                <p class="info-text">🎵 Play music near your microphone to see the constellation react</p>
+        <!-- Particle Energy Controls (hidden by default) -->
+        <div id="particle-controls" class="control-section particle-section" style="display:none;">
+            <h3>✨ Particle Settings</h3>
+
+            <div class="slider-group">
+                <label for="particle-behavior">Behavior Mode</label>
+                <select id="particle-behavior" class="mode-selector">
+                    <option value="flow">🌊 Flow</option>
+                    <option value="flocking">🐦 Flocking</option>
+                    <option value="vortex">🌀 Vortex</option>
+                    <option value="explosion">💥 Explosion</option>
+                    <option value="wells">🌌 Gravity Wells</option>
+                    <option value="shapes">⬡ Shape Formation</option>
+                </select>
             </div>
         </div>
+
+        <!-- Info -->
+        <div class="control-section info-section">
+            <p class="info-text">🎵 Play music near your microphone to see the constellation react</p>
+        </div>
+    </div>
     </div>
 
     <!-- Audio Permission Overlay -->
