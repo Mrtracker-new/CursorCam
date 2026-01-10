@@ -115,11 +115,16 @@ export class AudioEngine {
         totalEnergy: 0,
         loudness: 0,
         spectrum: null,
+        waveform: null,
       };
     }
 
     // Get frequency data
     this.analyser.getByteFrequencyData(this.dataArray);
+
+    // Get time-domain data for waveform visualization
+    const waveformData = new Uint8Array(this.analyser.fftSize);
+    this.analyser.getByteTimeDomainData(waveformData);
 
     // Calculate energy for each frequency band
     const subBassEnergy = this._calculateBandEnergy(this.subBassRange.start, this.subBassRange.end);
@@ -152,6 +157,7 @@ export class AudioEngine {
       totalEnergy: (normalizedSubBass + normalizedBass + normalizedMid + normalizedHigh) / 4,
       loudness: normalizedLoudness,
       spectrum: this.dataArray, // Raw spectrum for advanced use
+      waveform: waveformData, // Time-domain waveform data for oscilloscope modes
     };
   }
 
