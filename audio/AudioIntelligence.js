@@ -110,6 +110,7 @@ export class AudioIntelligence {
 
       // Raw data for advanced patterns
       spectrum: audioData.spectrum,
+      waveform: audioData.waveform, // Time-domain waveform data for oscilloscope modes
 
       // LEGACY COMPATIBILITY (for existing patterns)
       bassEnergy: audioData.bassEnergy || 0,
