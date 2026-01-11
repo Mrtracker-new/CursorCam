@@ -19,6 +19,29 @@ const StrobeState = {
   RED: 'red',
   WHITE: 'white',
   FULL_FLASH: 'full_flash',
+  RGB_CYCLE: 'rgb_cycle',
+  RAINBOW: 'rainbow',
+  BLACKOUT: 'blackout',
+};
+
+/**
+ * Strobe pattern sequences
+ */
+const StrobePatterns = {
+  CLASSIC: ['RED', 'WHITE'],
+  DOUBLE_PULSE: ['RED', 'RED', 'WHITE', 'WHITE'],
+  TRIPLET: ['RED', 'WHITE', 'OFF'],
+  QUAD: ['RED', 'WHITE', 'RGB_CYCLE', 'OFF'],
+  RANDOM: 'RANDOM',
+};
+
+/**
+ * Morse code patterns
+ */
+const MorseCode = {
+  BEAT: 'BEAT',  // Flash on every beat
+  S: [3, 3, 3, 3, 3], // ... (dot-gap-dot-gap-dot)
+  O: [9, 3, 9, 3, 9], // --- (dash-gap-dash-gap-dash)
 };
 
 /**
@@ -60,6 +83,25 @@ export class StrobeDiamondTunnel extends PatternBase {
     this.strobeState = StrobeState.OFF;
     this.strobeTimer = 0;
     this.beatCount = 0;
+
+    // RGB strobe state
+    this.rgbHue = 0; // 0-360 degrees
+    this.rgbSpeed = 5; // Hue increment per frame
+    this.rainbowOffset = 0; // Offset for rainbow mode
+
+    // Pattern sequence state
+    this.currentPattern = StrobePatterns.CLASSIC;
+    this.patternIndex = 0;
+    this.patternMode = true; // Enable pattern sequences
+
+    // Morse code state
+    this.morseMode = false;
+    this.morsePattern = MorseCode.BEAT;
+    this.morseIndex = 0;
+    this.morseTimer = 0;
+
+    // Color mode override (for UI control)
+    this._applyColorMode = 'normal'; // 'normal', 'rgb', 'rainbow'
 
     // Color state
     this.currentDiamondColor = 'red';
@@ -164,7 +206,41 @@ export class StrobeDiamondTunnel extends PatternBase {
    * Update strobe system
    */
   _updateStrobeSystem(visualParams) {
-    // Decrement timer
+    // RGB hue cycling (continuous) - cycle when in RGB/Rainbow mode OR when color mode is set
+    if (this.strobeState === StrobeState.RGB_CYCLE ||
+      this.strobeState === StrobeState.RAINBOW ||
+      this._applyColorMode === 'rgb' ||
+      this._applyColorMode === 'rainbow') {
+      this.rgbHue = (this.rgbHue + this.rgbSpeed) % 360;
+    }
+
+    // Morse code timing (if enabled)
+    if (this.morseMode) {
+      if (this.morseTimer > 0) {
+        this.morseTimer--;
+      }
+
+      if (this.morseTimer <= 0) {
+        // Get next morse timing
+        if (this.morsePattern === 'BEAT') {
+          // Simple beat mode - handled in _onBeat
+        } else if (Array.isArray(this.morsePattern)) {
+          const duration = this.morsePattern[this.morseIndex];
+          const isFlash = (this.morseIndex % 2 === 0);
+
+          if (isFlash) {
+            this._triggerStrobe(StrobeState.WHITE, duration);
+          } else {
+            this._triggerStrobe(StrobeState.OFF, duration);
+          }
+
+          this.morseIndex = (this.morseIndex + 1) % this.morsePattern.length;
+          this.morseTimer = duration;
+        }
+      }
+    }
+
+    // Decrement standard strobe timer
     if (this.strobeTimer > 0) {
       this.strobeTimer--;
       if (this.strobeTimer <= 0) {
@@ -173,8 +249,10 @@ export class StrobeDiamondTunnel extends PatternBase {
     }
 
     // High frequency strobe
-    if (visualParams.strobeRate > 5 && Math.random() < visualParams.strobeRate / 60) {
-      this._triggerStrobe(StrobeState.WHITE, 2);
+    if (!this.morseMode) {
+      if (visualParams.strobeRate > 5 && Math.random() < visualParams.strobeRate / 60) {
+        this._triggerStrobe(StrobeState.WHITE, 2);
+      }
     }
   }
 
@@ -209,12 +287,30 @@ export class StrobeDiamondTunnel extends PatternBase {
       const baseSize = this.config.baseDiamondSize * (1.0 - baseSizeIndex * 0.15);
       diamond.size = baseSize * visualParams.sizePulse;
 
-      // Apply strobe color
-      if (this.strobeState === StrobeState.WHITE) {
+      // Apply color based on mode priority:
+      // 1. Color mode override (RGB/Rainbow from UI)
+      // 2. Strobe state (beat-triggered)
+      // 3. Default color
+      if (this._applyColorMode === 'rgb') {
+        // Continuous RGB cycling (all diamonds same color)
+        diamond.color = `hsl(${this.rgbHue}, 100%, 50%)`;
+      } else if (this._applyColorMode === 'rainbow') {
+        // Continuous rainbow (each diamond different color)
+        const hueOffset = (i * 360) / this.diamonds.length;
+        diamond.color = `hsl(${(this.rgbHue + hueOffset) % 360}, 100%, 50%)`;
+      } else if (this.strobeState === StrobeState.WHITE) {
         diamond.color = 'white';
       } else if (this.strobeState === StrobeState.RED) {
         diamond.color = 'red';
+      } else if (this.strobeState === StrobeState.RGB_CYCLE) {
+        // All diamonds same RGB color
+        diamond.color = `hsl(${this.rgbHue}, 100%, 50%)`;
+      } else if (this.strobeState === StrobeState.RAINBOW) {
+        // Each diamond different color (rainbow spread)
+        const hueOffset = (i * 360) / this.diamonds.length;
+        diamond.color = `hsl(${(this.rgbHue + hueOffset) % 360}, 100%, 50%)`;
       } else {
+        // Default color
         diamond.color = this.currentDiamondColor;
       }
 
@@ -235,12 +331,22 @@ export class StrobeDiamondTunnel extends PatternBase {
     // BEAT BURST - dramatic radial chunk pulse
     this.beatBurst = 1.0 + beatData.confidence * 2.0; // 1.0x to 3.0x burst
 
-    // Beat strobe
-    const flashColor = this.beatCount % 2 === 0 ? StrobeState.RED : StrobeState.WHITE;
-    this._triggerStrobe(flashColor, 3);
+    // Determine strobe color based on mode
+    if (this.morseMode && this.morsePattern === 'BEAT') {
+      // Morse BEAT mode: white flash on every beat
+      this._triggerStrobe(StrobeState.WHITE, 3);
+    } else if (this.patternMode) {
+      // Pattern sequence mode
+      const nextColor = this._getNextPatternColor();
+      this._triggerStrobe(nextColor, 3);
+    } else {
+      // Classic mode: alternate red/white
+      const flashColor = this.beatCount % 2 === 0 ? StrobeState.RED : StrobeState.WHITE;
+      this._triggerStrobe(flashColor, 3);
+    }
 
-    // Every 4 beats: swap diamond color
-    if (this.beatCount % 4 === 0) {
+    // Every 4 beats: swap diamond color (if not in special modes)
+    if (this.beatCount % 4 === 0 && !this.patternMode && !this.morseMode) {
       this.currentDiamondColor = this.currentDiamondColor === 'red' ? 'white' : 'red';
     }
 
@@ -249,6 +355,20 @@ export class StrobeDiamondTunnel extends PatternBase {
       this._triggerStrobe(StrobeState.FULL_FLASH, 6);
       this.beatBurst = 3.5; // MASSIVE burst on drops
     }
+  }
+
+  /**
+   * Get next pattern color from sequence
+   */
+  _getNextPatternColor() {
+    if (this.currentPattern === 'RANDOM') {
+      const colors = [StrobeState.RED, StrobeState.WHITE, StrobeState.RGB_CYCLE];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    const colorName = this.currentPattern[this.patternIndex];
+    this.patternIndex = (this.patternIndex + 1) % this.currentPattern.length;
+    return StrobeState[colorName];
   }
 
   /**
