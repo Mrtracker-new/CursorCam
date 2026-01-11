@@ -15,9 +15,44 @@ export class ColorManager {
       deepBlack: 0x000000,
     };
 
+    // Color presets
+    this.presets = {
+      neon_nights: {
+        name: 'Neon Nights',
+        primary: 0xff00ff,
+        secondary: 0x00ffff,
+        accent: 0xffff00,
+      },
+      tokyo_cyber: {
+        name: 'Tokyo Cyber',
+        primary: 0xff0066,
+        secondary: 0x00ff99,
+        accent: 0xffffff,
+      },
+      matrix_green: {
+        name: 'Matrix Green',
+        primary: 0x00ff00,
+        secondary: 0x003300,
+        accent: 0x33ff33,
+      },
+      blade_runner: {
+        name: 'Blade Runner',
+        primary: 0xff6600,
+        secondary: 0x00ccff,
+        accent: 0xff00ff,
+      },
+      synthwave: {
+        name: 'Synthwave',
+        primary: 0xff006e,
+        secondary: 0x8338ec,
+        accent: 0xffbe0b,
+      },
+    };
+
     // Current active colors
     this.currentDominantColor = this.palette.electricCyan;
     this.currentAccentColor = this.palette.neonPink;
+    this.currentPreset = 'neon_nights';
 
     // Palette sets for beat-drop swapping
     this.paletteSets = [
@@ -27,6 +62,9 @@ export class ColorManager {
       { dominant: this.palette.purple, accent: this.palette.electricCyan },
     ];
     this.currentPaletteIndex = 0;
+
+    // Load saved preset if exists
+    this._loadSavedPreset();
   }
 
   /**
@@ -117,6 +155,118 @@ export class ColorManager {
   applyColorToMaterial(material, color) {
     if (material.color) {
       material.color.setHex(color);
+    }
+  }
+
+  /**
+   * Load color preset
+   */
+  loadPreset(presetName) {
+    const preset = this.presets[presetName];
+    if (!preset) {
+      console.warn(`Preset '${presetName}' not found`);
+      return;
+    }
+
+    this.currentPreset = presetName;
+    this.currentDominantColor = preset.primary;
+    this.currentAccentColor = preset.secondary;
+
+    // Update palette sets with preset colors
+    this.paletteSets = [
+      { dominant: preset.primary, accent: preset.secondary },
+      { dominant: preset.secondary, accent: preset.accent },
+      { dominant: preset.accent, accent: preset.primary },
+      { dominant: preset.primary, accent: preset.accent },
+    ];
+
+    // Save to localStorage
+    this._savePreset(presetName);
+
+    console.log(`🎨 Loaded preset: ${preset.name}`);
+  }
+
+  /**
+   * Get list of available presets
+   */
+  getPresetList() {
+    return Object.keys(this.presets).map(key => ({
+      id: key,
+      name: this.presets[key].name,
+    }));
+  }
+
+  /**
+   * Get current preset name
+   */
+  getCurrentPreset() {
+    return this.currentPreset;
+  }
+
+  /**
+   * Get primary color
+   */
+  getPrimaryColor() {
+    return this.currentDominantColor;
+  }
+
+  /**
+   * Get secondary color
+   */
+  getSecondaryColor() {
+    return this.currentAccentColor;
+  }
+
+  /**
+   * Export current preset as JSON
+   */
+  exportPreset() {
+    const preset = this.presets[this.currentPreset];
+    return JSON.stringify(preset, null, 2);
+  }
+
+  /**
+   * Import preset from JSON
+   */
+  importPreset(jsonString, presetName = 'custom') {
+    try {
+      const imported = JSON.parse(jsonString);
+      this.presets[presetName] = {
+        name: imported.name || presetName,
+        primary: imported.primary,
+        secondary: imported.secondary,
+        accent: imported.accent,
+      };
+      this.loadPreset(presetName);
+      return true;
+    } catch (error) {
+      console.error('Failed to import preset:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Save preset to localStorage
+   */
+  _savePreset(presetName) {
+    try {
+      localStorage.setItem('cyberpunk_color_preset', presetName);
+    } catch (error) {
+      // localStorage might not be available
+    }
+  }
+
+  /**
+   * Load saved preset from localStorage
+   */
+  _loadSavedPreset() {
+    try {
+      const saved = localStorage.getItem('cyberpunk_color_preset');
+      if (saved && this.presets[saved]) {
+        this.loadPreset(saved);
+      }
+    } catch (error) {
+      // localStorage might not be available
     }
   }
 }
