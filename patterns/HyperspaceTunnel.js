@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { PatternBase } from './PatternBase.js';
 
 /**
@@ -81,6 +83,68 @@ export class HyperspaceTunnel extends PatternBase {
         radius: 0.8,
       },
     };
+
+    // Quality presets for performance optimization
+    this.qualityPresets = {
+      low: {
+        tunnelSegments: 16,
+        particleCount: 500,
+        polygonCount: 3,
+        nodeCount: 6,
+        bloomEnabled: false,
+        useFXAA: true,
+        pixelRatio: 1.0,
+        bloomStrength: 0.5,
+      },
+      medium: {
+        tunnelSegments: 32,
+        particleCount: 1000,
+        polygonCount: 5,
+        nodeCount: 12,
+        bloomEnabled: false,
+        useFXAA: true,
+        pixelRatio: 1.5,
+        bloomStrength: 1.0,
+      },
+      high: {
+        tunnelSegments: 64,
+        particleCount: 2000,
+        polygonCount: 5,
+        nodeCount: 12,
+        bloomEnabled: true,
+        useFXAA: false,
+        pixelRatio: 2.0,
+        bloomStrength: 1.5,
+      },
+      ultra: {
+        tunnelSegments: 96,
+        particleCount: 3000,
+        polygonCount: 10,
+        nodeCount: 24,
+        bloomEnabled: true,
+        useFXAA: false,
+        pixelRatio: 2.0,
+        bloomStrength: 2.0,
+      },
+    };
+
+    // Current quality setting
+    this.currentQuality = 'high'; // Default to high quality
+    this.autoLOD = false; // Auto Level-of-Detail enabled
+
+    // LOD system state
+    this.lodState = {
+      fpsHistory: [],
+      maxHistoryLength: 60, // 1 second at 60 fps
+      lastQualityChange: 0,
+      qualityCooldown: 5000, // 5 seconds between quality changes
+      downgradeFpsThreshold: 40,
+      upgradeFpsThreshold: 55,
+      downgradeFrameCount: 0,
+      upgradeFrameCount: 0,
+      requiredDowngradeFrames: 180, // 3 seconds at 60fps
+      requiredUpgradeFrames: 300, // 5 seconds at 60fps
+    };
   }
 
   /**
@@ -151,7 +215,12 @@ export class HyperspaceTunnel extends PatternBase {
       alpha: false,
     });
     this.renderer.setSize(canvas.width, canvas.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Use quality-based pixel ratio
+    const qualitySettings = this.qualityPresets[this.currentQuality];
+    const targetPixelRatio = qualitySettings ? qualitySettings.pixelRatio : 2.0;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, targetPixelRatio));
+
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
   }
@@ -167,10 +236,11 @@ export class HyperspaceTunnel extends PatternBase {
   }
 
   /**
-   * Initialize post-processing (bloom)
+   * Initialize post-processing (bloom or FXAA)
    */
   _initPostProcessing() {
     const canvas = document.getElementById('constellation-canvas');
+    const qualitySettings = this.qualityPresets[this.currentQuality];
 
     this.composer = new EffectComposer(this.renderer);
 
@@ -178,27 +248,42 @@ export class HyperspaceTunnel extends PatternBase {
     const renderPass = new RenderPass(this.scene, this.camera);
     this.composer.addPass(renderPass);
 
-    // Bloom pass for neon glow
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(canvas.width, canvas.height),
-      this.config.bloom.strength,
-      this.config.bloom.radius,
-      this.config.bloom.threshold
-    );
-    this.composer.addPass(bloomPass);
-
-    this.bloomPass = bloomPass;
+    // Add bloom or FXAA based on quality
+    if (qualitySettings.bloomEnabled) {
+      // Bloom pass for neon glow (high quality)
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(canvas.width, canvas.height),
+        qualitySettings.bloomStrength,
+        this.config.bloom.radius,
+        this.config.bloom.threshold
+      );
+      this.composer.addPass(bloomPass);
+      this.bloomPass = bloomPass;
+      this.fxaaPass = null;
+    } else if (qualitySettings.useFXAA) {
+      // FXAA pass for performance (low/medium quality)
+      const fxaaPass = new ShaderPass(FXAAShader);
+      const pixelRatio = this.renderer.getPixelRatio();
+      fxaaPass.material.uniforms['resolution'].value.x = 1 / (canvas.width * pixelRatio);
+      fxaaPass.material.uniforms['resolution'].value.y = 1 / (canvas.height * pixelRatio);
+      this.composer.addPass(fxaaPass);
+      this.fxaaPass = fxaaPass;
+      this.bloomPass = null;
+    }
   }
 
   /**
    * Create tunnel geometry
    */
   _createTunnel() {
+    const qualitySettings = this.qualityPresets[this.currentQuality];
+    const segments = qualitySettings ? qualitySettings.tunnelSegments : this.config.tunnel.segments;
+
     const geometry = new THREE.CylinderGeometry(
       this.config.tunnel.radius,
       this.config.tunnel.radius,
       this.config.tunnel.length,
-      this.config.tunnel.segments,
+      segments,
       1,
       true // Open-ended
     );
@@ -392,6 +477,9 @@ export class HyperspaceTunnel extends PatternBase {
     // Map audio to visual parameters
     this._mapAudioToVisuals(audioData, beatData);
 
+    // Update LOD system if enabled
+    this._updateLOD();
+
     // Update animations
     this._updateTunnelMotion();
     this._updateCentralPolygons();
@@ -429,6 +517,218 @@ export class HyperspaceTunnel extends PatternBase {
 
     // Beat Sensitivity → Stored for beat detection (handled by beatDetector)
     // No action needed here, BeatDetector already uses it
+  }
+
+  /**
+   * Update Level-of-Detail based on performance
+   */
+  _updateLOD() {
+    if (!this.autoLOD) {
+      return; // LOD disabled
+    }
+
+    // Get FPS from performance monitor
+    const perfMonitor = window.cursorCam?.performanceMonitor;
+    if (!perfMonitor) {
+      return;
+    }
+
+    const currentFPS = perfMonitor.fps || 60;
+
+    // Add to history
+    this.lodState.fpsHistory.push(currentFPS);
+    if (this.lodState.fpsHistory.length > this.lodState.maxHistoryLength) {
+      this.lodState.fpsHistory.shift();
+    }
+
+    // Calculate rolling average FPS
+    const avgFPS =
+      this.lodState.fpsHistory.reduce((sum, fps) => sum + fps, 0) / this.lodState.fpsHistory.length;
+
+    // Check for quality change cooldown
+    const now = Date.now();
+    if (now - this.lodState.lastQualityChange < this.lodState.qualityCooldown) {
+      return; // Still in cooldown
+    }
+
+    // Determine quality levels
+    const qualityLevels = ['low', 'medium', 'high', 'ultra'];
+    const currentIndex = qualityLevels.indexOf(this.currentQuality);
+
+    // Downgrade if FPS too low
+    if (avgFPS < this.lodState.downgradeFpsThreshold) {
+      this.lodState.downgradeFrameCount++;
+      this.lodState.upgradeFrameCount = 0;
+
+      if (
+        this.lodState.downgradeFrameCount >= this.lodState.requiredDowngradeFrames &&
+        currentIndex > 0
+      ) {
+        const newQuality = qualityLevels[currentIndex - 1];
+        console.log(`🔻 LOD: Downgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`);
+        this.setQuality(newQuality);
+        this.lodState.downgradeFrameCount = 0;
+        this.lodState.lastQualityChange = now;
+      }
+    }
+    // Upgrade if FPS very good
+    else if (avgFPS > this.lodState.upgradeFpsThreshold) {
+      this.lodState.upgradeFrameCount++;
+      this.lodState.downgradeFrameCount = 0;
+
+      if (
+        this.lodState.upgradeFrameCount >= this.lodState.requiredUpgradeFrames &&
+        currentIndex < qualityLevels.length - 1
+      ) {
+        const newQuality = qualityLevels[currentIndex + 1];
+        console.log(`🔺 LOD: Upgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`);
+        this.setQuality(newQuality);
+        this.lodState.upgradeFrameCount = 0;
+        this.lodState.lastQualityChange = now;
+      }
+    } else {
+      // FPS in acceptable range, reset counters
+      this.lodState.downgradeFrameCount = 0;
+      this.lodState.upgradeFrameCount = 0;
+    }
+  }
+
+  /**
+   * Set quality level (public API)
+   */
+  setQuality(quality) {
+    if (quality === 'auto') {
+      this.autoLOD = true;
+      console.log('🤖 Auto LOD enabled');
+      return;
+    }
+
+    if (!this.qualityPresets[quality]) {
+      console.warn(`Invalid quality: ${quality}`);
+      return;
+    }
+
+    if (quality === this.currentQuality) {
+      return; // No change
+    }
+
+    const oldQuality = this.currentQuality;
+    this.currentQuality = quality;
+    this.autoLOD = false;
+
+    console.log(`✨ Quality changed: ${oldQuality} → ${quality}`);
+
+    // Apply quality changes
+    this._applyQualityChanges();
+  }
+
+  /**
+   * Apply quality changes to existing elements
+   */
+  _applyQualityChanges() {
+    if (!this.scene) {
+      return;
+    }
+
+    const qualitySettings = this.qualityPresets[this.currentQuality];
+
+    // Update pixel ratio
+    if (this.renderer) {
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualitySettings.pixelRatio));
+    }
+
+    // Rebuild tunnel geometry with new segment count
+    this._rebuildTunnelGeometry(qualitySettings.tunnelSegments);
+
+    // Update particle count
+    this._updateParticleCount(qualitySettings.particleCount);
+
+    // Update polygon count
+    this._updatePolygonCount(qualitySettings.polygonCount);
+
+    // Update bloom settings
+    this._updatePostProcessing(qualitySettings);
+  }
+
+  /**
+   * Update post-processing based on quality settings
+   */
+  _updatePostProcessing(qualitySettings) {
+    if (!this.composer) {
+      return;
+    }
+
+    const canvas = document.getElementById('constellation-canvas');
+    if (!canvas) {
+      return;
+    }
+
+    // Remove existing bloom or FXAA pass
+    if (this.bloomPass) {
+      this.composer.removePass(this.bloomPass);
+      this.bloomPass = null;
+    }
+    if (this.fxaaPass) {
+      this.composer.removePass(this.fxaaPass);
+      this.fxaaPass = null;
+    }
+
+    // Add appropriate post-processing
+    if (qualitySettings.bloomEnabled) {
+      // Add bloom
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(canvas.width, canvas.height),
+        qualitySettings.bloomStrength,
+        this.config.bloom.radius,
+        this.config.bloom.threshold
+      );
+      this.composer.addPass(bloomPass);
+      this.bloomPass = bloomPass;
+    } else if (qualitySettings.useFXAA) {
+      // Add FXAA
+      const fxaaPass = new ShaderPass(FXAAShader);
+      const pixelRatio = this.renderer.getPixelRatio();
+      fxaaPass.material.uniforms['resolution'].value.x = 1 / (canvas.width * pixelRatio);
+      fxaaPass.material.uniforms['resolution'].value.y = 1 / (canvas.height * pixelRatio);
+      this.composer.addPass(fxaaPass);
+      this.fxaaPass = fxaaPass;
+    }
+  }
+
+  /**
+   * Rebuild tunnel geometry with new segment count
+   */
+  _rebuildTunnelGeometry(segments) {
+    if (!this.tunnel || !this.tunnel2) {
+      return;
+    }
+
+    // Store positions
+    const pos1 = this.tunnel.position.clone();
+    const pos2 = this.tunnel2.position.clone();
+
+    // Dispose old geometry
+    this.tunnel.geometry.dispose();
+    this.tunnel2.geometry.dispose();
+
+    // Create new geometry
+    const geometry = new THREE.CylinderGeometry(
+      this.config.tunnel.radius,
+      this.config.tunnel.radius,
+      this.config.tunnel.length,
+      segments,
+      1,
+      true
+    );
+    geometry.rotateX(Math.PI / 2);
+
+    // Update both tunnels
+    this.tunnel.geometry = geometry;
+    this.tunnel2.geometry = geometry.clone();
+
+    // Restore positions
+    this.tunnel.position.copy(pos1);
+    this.tunnel2.position.copy(pos2);
   }
 
   /**
