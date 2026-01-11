@@ -11,6 +11,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { PatternBase } from './PatternBase.js';
+import { ThreeJsHelper } from './utils/ThreeJsHelper.js';
 
 /**
  * SimplexNoise implementation for terrain detail
@@ -203,26 +204,32 @@ export class AudioLandscape extends PatternBase {
             return;
         }
 
-        // Create separate canvas for Three.js
-        const threeCanvas = document.createElement('canvas');
-        threeCanvas.id = 'three-canvas';
-        threeCanvas.style.position = 'absolute';
-        threeCanvas.style.top = '0';
-        threeCanvas.style.left = '0';
-        threeCanvas.style.width = '100%';
-        threeCanvas.style.height = '100%';
-        threeCanvas.style.zIndex = '1';
-        threeCanvas.width = mainCanvas.width;
-        threeCanvas.height = mainCanvas.height;
-
-        mainCanvas.parentElement.appendChild(threeCanvas);
+        // Use helper to create ThreeJs canvas
+        const { threeCanvas } = ThreeJsHelper.createCanvas(mainCanvas);
         this.threeCanvas = threeCanvas;
-        mainCanvas.style.display = 'none';
 
-        // Initialize Three.js
-        this._initScene();
-        this._initRenderer(threeCanvas);
-        this._initCamera(threeCanvas);
+        // Initialize Three.js using helper
+        this.scene = ThreeJsHelper.createScene({
+            backgroundColor: this.config.colors.skyColor,
+            fogColor: this.config.colors.fogColor,
+            fogDensity: 0.015,
+        });
+
+        const qualitySettings = this.qualityPresets[this.currentQuality];
+        this.renderer = ThreeJsHelper.createRenderer(threeCanvas, {
+            pixelRatio: qualitySettings.pixelRatio,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 0.6,  // Lower exposure to prevent washout
+        });
+
+        this.camera = ThreeJsHelper.createCamera(threeCanvas, {
+            fov: this.config.camera.fov,
+            near: 0.1,
+            far: 500,
+            position: { x: 0, y: this.config.camera.height, z: this.config.camera.distance },
+            lookAt: { x: 0, y: 0, z: -this.config.camera.lookAhead },
+        });
+
         this._initPostProcessing();
 
         // Create visual elements
@@ -233,42 +240,7 @@ export class AudioLandscape extends PatternBase {
         console.log('✅ Audio Landscape ready');
     }
 
-    /**
-   * Initialize scene
-   */
-    _initScene() {
-        this.scene = new THREE.Scene();
-        this.scene.background = this.config.colors.skyColor;
-        // Purple-tinted fog for depth
-        this.scene.fog = new THREE.FogExp2(this.config.colors.fogColor, 0.015);
-    }
 
-    /**
-     * Initialize renderer
-     */
-    _initRenderer(canvas) {
-        this.renderer = new THREE.WebGLRenderer({
-            canvas,
-            antialias: true,
-            alpha: false,
-        });
-        this.renderer.setSize(canvas.width, canvas.height);
-
-        const qualitySettings = this.qualityPresets[this.currentQuality];
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualitySettings.pixelRatio));
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 0.6; // Lower exposure to prevent washout
-    }
-
-    /**
-     * Initialize camera
-     */
-    _initCamera(canvas) {
-        const aspect = canvas.width / canvas.height;
-        this.camera = new THREE.PerspectiveCamera(this.config.camera.fov, aspect, 0.1, 500);
-        this.camera.position.set(0, this.config.camera.height, this.config.camera.distance);
-        this.camera.lookAt(0, 0, -this.config.camera.lookAhead);
-    }
 
     /**
      * Initialize post-processing
@@ -768,40 +740,14 @@ export class AudioLandscape extends PatternBase {
     onDeactivate() {
         console.log('🏔️ Audio Landscape deactivating...');
 
-        // Remove Three.js canvas
-        if (this.threeCanvas && this.threeCanvas.parentElement) {
-            this.threeCanvas.parentElement.removeChild(this.threeCanvas);
-        }
-
-        // Show main canvas
         const mainCanvas = document.getElementById('constellation-canvas');
-        if (mainCanvas) {
-            mainCanvas.style.display = 'block';
-        }
-
-        // Dispose Three.js resources
-        if (this.scene) {
-            this.scene.traverse((object) => {
-                if (object.geometry) {
-                    object.geometry.dispose();
-                }
-                if (object.material) {
-                    if (Array.isArray(object.material)) {
-                        object.material.forEach(material => material.dispose());
-                    } else {
-                        object.material.dispose();
-                    }
-                }
-            });
-        }
-
-        if (this.renderer) {
-            this.renderer.dispose();
-        }
-
-        if (this.composer) {
-            this.composer.dispose();
-        }
+        ThreeJsHelper.cleanup({
+            threeCanvas: this.threeCanvas,
+            mainCanvas: mainCanvas,
+            scene: this.scene,
+            renderer: this.renderer,
+            composer: this.composer,
+        });
 
         this.scene = null;
         this.camera = null;

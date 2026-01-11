@@ -11,6 +11,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { PatternBase } from './PatternBase.js';
+import { ThreeJsHelper } from './utils/ThreeJsHelper.js';
 
 /**
  * Hyperspace Tunnel - Advanced 3D Audio-Reactive Pattern
@@ -159,29 +160,32 @@ export class HyperspaceTunnel extends PatternBase {
       return;
     }
 
-    // Create a separate canvas for Three.js to avoid WebGL/2D context conflict
-    const threeCanvas = document.createElement('canvas');
-    threeCanvas.id = 'three-canvas';
-    threeCanvas.style.position = 'absolute';
-    threeCanvas.style.top = '0';
-    threeCanvas.style.left = '0';
-    threeCanvas.style.width = '100%';
-    threeCanvas.style.height = '100%';
-    threeCanvas.style.zIndex = '1';
-    threeCanvas.width = mainCanvas.width;
-    threeCanvas.height = mainCanvas.height;
-
-    // Insert Three.js canvas into DOM
-    mainCanvas.parentElement.appendChild(threeCanvas);
+    // Use helper to create and setup Three.js canvas
+    const { threeCanvas } = ThreeJsHelper.createCanvas(mainCanvas);
     this.threeCanvas = threeCanvas;
 
-    // Hide main 2D canvas
-    mainCanvas.style.display = 'none';
+    // Initialize Three.js using helper
+    this.scene = ThreeJsHelper.createScene({
+      backgroundColor: 0x000000,
+      fogColor: this.config.tunnel.fogColor,
+      fogDensity: 0.015,
+    });
 
-    // Initialize Three.js
-    this._initScene(threeCanvas);
-    this._initRenderer(threeCanvas);
-    this._initCamera(threeCanvas);
+    const qualitySettings = this.qualityPresets[this.currentQuality];
+    this.renderer = ThreeJsHelper.createRenderer(threeCanvas, {
+      pixelRatio: qualitySettings.pixelRatio,
+      toneMapping: THREE.ACESFilmicToneMapping,
+      toneMappingExposure: 1.2,
+    });
+
+    this.camera = ThreeJsHelper.createCamera(threeCanvas, {
+      fov: this.config.camera.fov,
+      near: 0.1,
+      far: 1000,
+      position: { x: 0, y: 0, z: 0 },
+      lookAt: { x: 0, y: 0, z: -10 },
+    });
+
     this._initPostProcessing();
 
     // Create visual elements
@@ -194,46 +198,7 @@ export class HyperspaceTunnel extends PatternBase {
     console.log('✅ Hyperspace Tunnel ready');
   }
 
-  /**
-   * Initialize Three.js scene
-   */
-  _initScene(canvas) {
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x000000);
 
-    // Volumetric fog
-    this.scene.fog = new THREE.FogExp2(this.config.tunnel.fogColor, 0.015);
-  }
-
-  /**
-   * Initialize WebGL renderer
-   */
-  _initRenderer(canvas) {
-    this.renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-    });
-    this.renderer.setSize(canvas.width, canvas.height);
-
-    // Use quality-based pixel ratio
-    const qualitySettings = this.qualityPresets[this.currentQuality];
-    const targetPixelRatio = qualitySettings ? qualitySettings.pixelRatio : 2.0;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, targetPixelRatio));
-
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.2;
-  }
-
-  /**
-   * Initialize camera
-   */
-  _initCamera(canvas) {
-    const aspect = canvas.width / canvas.height;
-    this.camera = new THREE.PerspectiveCamera(this.config.camera.fov, aspect, 0.1, 1000);
-    this.camera.position.set(0, 0, 0);
-    this.camera.lookAt(0, 0, -10);
-  }
 
   /**
    * Initialize post-processing (bloom or FXAA)
@@ -980,56 +945,14 @@ export class HyperspaceTunnel extends PatternBase {
   onDeactivate() {
     console.log('🚀 Hyperspace Tunnel deactivating...');
 
-    // Dispose geometries
-    if (this.tunnel) {
-      this.tunnel.geometry.dispose();
-      this.tunnel.material.dispose();
-    }
-    if (this.tunnel2) {
-      this.tunnel2.geometry.dispose();
-      this.tunnel2.material.dispose();
-    }
-
-    this.centralPolygons.forEach((p) => {
-      p.geometry.dispose();
-      p.material.dispose();
-    });
-
-    this.radialNodes.forEach((n) => {
-      n.geometry.dispose();
-      n.material.dispose();
-    });
-
-    if (this.particles) {
-      this.particles.geometry.dispose();
-      this.particles.material.dispose();
-    }
-
-    // Dispose renderer
-    if (this.renderer) {
-      this.renderer.dispose();
-    }
-
-    // Dispose composer
-    if (this.composer) {
-      this.composer.dispose();
-    }
-
-    // Clear scene
-    if (this.scene) {
-      this.scene.clear();
-    }
-
-    // Remove Three.js canvas from DOM
-    if (this.threeCanvas && this.threeCanvas.parentElement) {
-      this.threeCanvas.parentElement.removeChild(this.threeCanvas);
-    }
-
-    // Restore main 2D canvas
     const mainCanvas = document.getElementById('constellation-canvas');
-    if (mainCanvas) {
-      mainCanvas.style.display = 'block';
-    }
+    ThreeJsHelper.cleanup({
+      threeCanvas: this.threeCanvas,
+      mainCanvas: mainCanvas,
+      scene: this.scene,
+      renderer: this.renderer,
+      composer: this.composer,
+    });
 
     this.centralPolygons = [];
     this.radialNodes = [];

@@ -9,6 +9,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { PatternBase } from './PatternBase.js';
+import { ThreeJsHelper } from './utils/ThreeJsHelper.js';
 import { ColorManager } from './cyberpunk/ColorManager.js';
 import { StateManager } from './cyberpunk/StateManager.js';
 import { GeometryManager } from './cyberpunk/GeometryManager.js';
@@ -85,28 +86,31 @@ export class CyberpunkMode extends PatternBase {
       return;
     }
 
-    // Create separate Three.js canvas
-    const threeCanvas = document.createElement('canvas');
-    threeCanvas.id = 'three-canvas';
-    threeCanvas.style.position = 'absolute';
-    threeCanvas.style.top = '0';
-    threeCanvas.style.left = '0';
-    threeCanvas.style.width = '100%';
-    threeCanvas.style.height = '100%';
-    threeCanvas.style.zIndex = '1';
-    threeCanvas.width = mainCanvas.width;
-    threeCanvas.height = mainCanvas.height;
-
-    mainCanvas.parentElement.appendChild(threeCanvas);
+    // Use helper to create ThreeJs canvas
+    const { threeCanvas } = ThreeJsHelper.createCanvas(mainCanvas);
     this.threeCanvas = threeCanvas;
 
-    // Hide main 2D canvas
-    mainCanvas.style.display = 'none';
+    // Initialize Three.js using helper
+    this.scene = ThreeJsHelper.createScene({
+      backgroundColor: 0x000000,
+      fogColor: 0x000000,
+      fogDensity: 0.02,
+    });
 
-    // Initialize Three.js
-    this._initScene();
-    this._initRenderer(threeCanvas);
-    this._initCamera(threeCanvas);
+    this.renderer = ThreeJsHelper.createRenderer(threeCanvas, {
+      pixelRatio: 2.0,
+      toneMapping: THREE.ACESFilmicToneMapping,
+      toneMappingExposure: 1.2,
+    });
+
+    this.camera = ThreeJsHelper.createCamera(threeCanvas, {
+      fov: this.config.camera.fov,
+      near: this.config.camera.near,
+      far: this.config.camera.far,
+      position: { x: 0, y: 0, z: 0 },
+      lookAt: { x: 0, y: 0, z: -10 },
+    });
+
     this._initPostProcessing(threeCanvas);
 
     // Initialize subsystems
@@ -134,44 +138,7 @@ export class CyberpunkMode extends PatternBase {
     console.log('✅ Cyberpunk Mode ready');
   }
 
-  /**
-   * Initialize scene
-   */
-  _initScene() {
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x000000);
-    this.scene.fog = new THREE.FogExp2(0x000000, 0.02);
-  }
 
-  /**
-   * Initialize renderer
-   */
-  _initRenderer(canvas) {
-    this.renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-    });
-    this.renderer.setSize(canvas.width, canvas.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.2;
-  }
-
-  /**
-   * Initialize camera
-   */
-  _initCamera(canvas) {
-    const aspect = canvas.width / canvas.height;
-    this.camera = new THREE.PerspectiveCamera(
-      this.config.camera.fov,
-      aspect,
-      this.config.camera.near,
-      this.config.camera.far
-    );
-    this.camera.position.set(0, 0, 0);
-    this.camera.lookAt(0, 0, -10);
-  }
 
   /**
    * Initialize post-processing
@@ -385,29 +352,15 @@ export class CyberpunkMode extends PatternBase {
       this.cameraShake.dispose();
     }
 
-    // Dispose renderer and composer
-    if (this.renderer) {
-      this.renderer.dispose();
-    }
-    if (this.composer) {
-      this.composer.dispose();
-    }
-
-    // Clear scene
-    if (this.scene) {
-      this.scene.clear();
-    }
-
-    // Remove Three.js canvas
-    if (this.threeCanvas && this.threeCanvas.parentElement) {
-      this.threeCanvas.parentElement.removeChild(this.threeCanvas);
-    }
-
-    // Restore main 2D canvas
+    // Cleanup Three.js resources using helper
     const mainCanvas = document.getElementById('constellation-canvas');
-    if (mainCanvas) {
-      mainCanvas.style.display = 'block';
-    }
+    ThreeJsHelper.cleanup({
+      threeCanvas: this.threeCanvas,
+      mainCanvas: mainCanvas,
+      scene: this.scene,
+      renderer: this.renderer,
+      composer: this.composer,
+    });
 
     // Hide controls
     this._hideControls();
