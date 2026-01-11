@@ -171,6 +171,57 @@
             </div>
         </div>
 
+        <!-- Hyperspace Tunnel Controls (hidden by default) -->
+        <div id="hyperspace-controls" class="control-section hyperspace-section" style="display:none;">
+            <h3>🚀 Hyperspace Settings</h3>
+
+            <div class="slider-group">
+                <label for="hyperspace-quality">Quality Mode</label>
+                <select id="hyperspace-quality" class="mode-selector">
+                    <option value="low">⚡ Low (Max FPS)</option>
+                    <option value="medium">📊 Medium (Balanced)</option>
+                    <option value="high" selected>✨ High (Recommended)</option>
+                    <option value="ultra">💎 Ultra (Best Quality)</option>
+                    <option value="auto">🤖 Auto (Adaptive LOD)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Strobe Diamond Tunnel Controls (hidden by default) -->
+        <div id="strobe-controls" class="control-section strobe-section" style="display:none;">
+            <h3>💎 Strobe Settings</h3>
+
+            <div class="slider-group">
+                <label for="strobe-pattern">Pattern Sequence</label>
+                <select id="strobe-pattern" class="mode-selector">
+                    <option value="classic" selected>🎯 Classic (Red/White)</option>
+                    <option value="double">⚡ Double Pulse</option>
+                    <option value="triplet">🎼 Triplet</option>
+                    <option value="quad">🌈 Quad (RGB Mix)</option>
+                    <option value="random">🎲 Random</option>
+                </select>
+            </div>
+
+            <div class="slider-group">
+                <label for="strobe-color">Color Mode</label>
+                <select id="strobe-color" class="mode-selector">
+                    <option value="normal" selected>⚪ Normal</option>
+                    <option value="rgb">🌈 RGB Cycle</option>
+                    <option value="rainbow">🎨 Rainbow</option>
+                </select>
+            </div>
+
+            <div class="slider-group">
+                <label for="strobe-morse">Morse Code</label>
+                <select id="strobe-morse" class="mode-selector">
+                    <option value="off" selected>❌ Off</option>
+                    <option value="beat">🥁 Beat (Flash Every Beat)</option>
+                    <option value="s">📡 S (···)</option>
+                    <option value="o">📡 O (───)</option>
+                </select>
+            </div>
+        </div>
+
         <!-- Info -->
         <div class="control-section info-section">
             <p class="info-text">🎵 Play music near your microphone to see the constellation react</p>
