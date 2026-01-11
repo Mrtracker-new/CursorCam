@@ -405,7 +405,9 @@ export class WaveformSpectrum extends PatternBase {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (network.nodes.length === 0) return;
+    if (network.nodes.length === 0) {
+      return;
+    }
 
     const color = renderer.colorSystem.getColorForAudioState(audioData);
     const colorStr = renderer.colorSystem.rgbToString(color);
@@ -443,7 +445,9 @@ export class WaveformSpectrum extends PatternBase {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (this.spectrogramHistory.length === 0) return;
+    if (this.spectrogramHistory.length === 0) {
+      return;
+    }
 
     const columnWidth = canvas.width / this.spectrogramMaxHistory;
     const rowHeight = canvas.height / this.spectrogramBands;
@@ -480,7 +484,9 @@ export class WaveformSpectrum extends PatternBase {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (network.nodes.length === 0) return;
+    if (network.nodes.length === 0) {
+      return;
+    }
 
     const color = renderer.colorSystem.getColorForAudioState(audioData);
     const colorStr = renderer.colorSystem.rgbToString(color);

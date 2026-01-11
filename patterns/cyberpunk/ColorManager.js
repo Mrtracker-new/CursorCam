@@ -190,7 +190,7 @@ export class ColorManager {
    * Get list of available presets
    */
   getPresetList() {
-    return Object.keys(this.presets).map(key => ({
+    return Object.keys(this.presets).map((key) => ({
       id: key,
       name: this.presets[key].name,
     }));

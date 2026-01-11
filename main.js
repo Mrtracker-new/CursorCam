@@ -21,6 +21,7 @@ import { HyperspaceTunnel } from './patterns/HyperspaceTunnel.js';
 import { WaveformSpectrum } from './patterns/WaveformSpectrum.js';
 import { ParticleEnergy } from './patterns/ParticleEnergy.js';
 import { CyberpunkMode } from './patterns/CyberpunkMode.js';
+import { AudioLandscape } from './patterns/AudioLandscape.js';
 
 /**
  * Main CursorCam Application
@@ -50,6 +51,7 @@ class CursorCam {
       waveform: new WaveformSpectrum(),
       particles: new ParticleEnergy(),
       cyberpunk: new CyberpunkMode(),
+      landscape: new AudioLandscape(),
     };
     this.currentPattern = this.patterns['pulsing']; // Default pattern
 
@@ -208,11 +210,11 @@ class CursorCam {
         const pattern = this.patterns['diamond-strobe'];
         if (pattern) {
           const patterns = {
-            'classic': ['RED', 'WHITE'],
-            'double': ['RED', 'RED', 'WHITE', 'WHITE'],
-            'triplet': ['RED', 'WHITE', 'OFF'],
-            'quad': ['RED', 'WHITE', 'RGB_CYCLE', 'OFF'],
-            'random': 'RANDOM'
+            classic: ['RED', 'WHITE'],
+            double: ['RED', 'RED', 'WHITE', 'WHITE'],
+            triplet: ['RED', 'WHITE', 'OFF'],
+            quad: ['RED', 'WHITE', 'RGB_CYCLE', 'OFF'],
+            random: 'RANDOM',
           };
           pattern.currentPattern = patterns[e.target.value];
           pattern.patternIndex = 0;

@@ -188,7 +188,7 @@ export class StateManager {
       peak_to_breakdown: 0.72,
       breakdown_to_peak: 0.65,
       breakdown_to_drop: 0.88,
-      drop_to_breakdown: 0.80,
+      drop_to_breakdown: 0.8,
     };
 
     const current = this.currentState;
@@ -196,26 +196,42 @@ export class StateManager {
     // State machine with hysteresis
     switch (current) {
       case 'CALM':
-        if (energy > thresholds.calm_to_building) return 'BUILDING';
+        if (energy > thresholds.calm_to_building) {
+          return 'BUILDING';
+        }
         break;
 
       case 'BUILDING':
-        if (energy < thresholds.building_to_calm) return 'CALM';
-        if (energy > thresholds.building_to_peak) return 'PEAK';
+        if (energy < thresholds.building_to_calm) {
+          return 'CALM';
+        }
+        if (energy > thresholds.building_to_peak) {
+          return 'PEAK';
+        }
         break;
 
       case 'PEAK':
-        if (energy < thresholds.peak_to_building) return 'BUILDING';
-        if (energy > thresholds.peak_to_breakdown) return 'BREAKDOWN';
+        if (energy < thresholds.peak_to_building) {
+          return 'BUILDING';
+        }
+        if (energy > thresholds.peak_to_breakdown) {
+          return 'BREAKDOWN';
+        }
         break;
 
       case 'BREAKDOWN':
-        if (energy < thresholds.breakdown_to_peak) return 'PEAK';
-        if (energy > thresholds.breakdown_to_drop) return 'DROP';
+        if (energy < thresholds.breakdown_to_peak) {
+          return 'PEAK';
+        }
+        if (energy > thresholds.breakdown_to_drop) {
+          return 'DROP';
+        }
         break;
 
       case 'DROP':
-        if (energy < thresholds.drop_to_breakdown) return 'BREAKDOWN';
+        if (energy < thresholds.drop_to_breakdown) {
+          return 'BREAKDOWN';
+        }
         break;
     }
 

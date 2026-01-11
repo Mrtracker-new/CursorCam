@@ -215,7 +215,13 @@ export class ParticleEnergy extends PatternBase {
 
     // Beat burst
     if (beatData.isBeat && beatData.confidence > 0.5) {
-      this._createBurst(canvas.width / 2, canvas.height / 2, Math.floor(bassValue * 30) + 20, 8 + bassValue * 15, audioData);
+      this._createBurst(
+        canvas.width / 2,
+        canvas.height / 2,
+        Math.floor(bassValue * 30) + 20,
+        8 + bassValue * 15,
+        audioData
+      );
     }
   }
 
@@ -239,8 +245,14 @@ export class ParticleEnergy extends PatternBase {
       const cohesionWeight = 1.0 + midValue * 1.5;
 
       // Apply forces
-      particle.vx += separation.x * separationWeight + alignment.x * alignmentWeight + cohesion.x * cohesionWeight;
-      particle.vy += separation.y * separationWeight + alignment.y * alignmentWeight + cohesion.y * cohesionWeight;
+      particle.vx +=
+        separation.x * separationWeight +
+        alignment.x * alignmentWeight +
+        cohesion.x * cohesionWeight;
+      particle.vy +=
+        separation.y * separationWeight +
+        alignment.y * alignmentWeight +
+        cohesion.y * cohesionWeight;
 
       // Limit speed
       const maxSpeed = 3 + audioData.totalEnergy * 5;
@@ -265,7 +277,9 @@ export class ParticleEnergy extends PatternBase {
     let count = 0;
 
     for (const other of this.particles) {
-      if (other === particle) continue;
+      if (other === particle) {
+        continue;
+      }
 
       const dx = particle.x - other.x;
       const dy = particle.y - other.y;
@@ -292,7 +306,9 @@ export class ParticleEnergy extends PatternBase {
     let count = 0;
 
     for (const other of this.particles) {
-      if (other === particle) continue;
+      if (other === particle) {
+        continue;
+      }
 
       const dx = particle.x - other.x;
       const dy = particle.y - other.y;
@@ -321,7 +337,9 @@ export class ParticleEnergy extends PatternBase {
     let count = 0;
 
     for (const other of this.particles) {
-      if (other === particle) continue;
+      if (other === particle) {
+        continue;
+      }
 
       const dx = particle.x - other.x;
       const dy = particle.y - other.y;
@@ -581,9 +599,10 @@ export class ParticleEnergy extends PatternBase {
       const spikeProgress = angleInSpike / spikeAngle;
 
       // Interpolate between inner and outer radius
-      const radius = spikeProgress < 0.5
-        ? innerRadius + (outerRadius - innerRadius) * (spikeProgress * 2)
-        : outerRadius - (outerRadius - innerRadius) * ((spikeProgress - 0.5) * 2);
+      const radius =
+        spikeProgress < 0.5
+          ? innerRadius + (outerRadius - innerRadius) * (spikeProgress * 2)
+          : outerRadius - (outerRadius - innerRadius) * ((spikeProgress - 0.5) * 2);
 
       points.push({
         x: centerX + Math.cos(angle) * radius,
@@ -645,10 +664,18 @@ export class ParticleEnergy extends PatternBase {
       particle.life -= 0.015;
 
       // Wrap around edges
-      if (particle.x < 0) particle.x = canvas.width;
-      if (particle.x > canvas.width) particle.x = 0;
-      if (particle.y < 0) particle.y = canvas.height;
-      if (particle.y > canvas.height) particle.y = 0;
+      if (particle.x < 0) {
+        particle.x = canvas.width;
+      }
+      if (particle.x > canvas.width) {
+        particle.x = 0;
+      }
+      if (particle.y < 0) {
+        particle.y = canvas.height;
+      }
+      if (particle.y > canvas.height) {
+        particle.y = 0;
+      }
 
       // Update brightness based on speed
       const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
@@ -677,7 +704,14 @@ export class ParticleEnergy extends PatternBase {
     // Draw gravity wells if in wells mode
     if (this.currentBehavior === ParticleBehavior.GRAVITY_WELLS && this.wells.length > 0) {
       for (const well of this.wells) {
-        const gradient = ctx.createRadialGradient(well.x, well.y, 0, well.x, well.y, 50 * well.strength);
+        const gradient = ctx.createRadialGradient(
+          well.x,
+          well.y,
+          0,
+          well.x,
+          well.y,
+          50 * well.strength
+        );
         gradient.addColorStop(0, `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.3)`);
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 

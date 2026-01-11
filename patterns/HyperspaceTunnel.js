@@ -565,7 +565,9 @@ export class HyperspaceTunnel extends PatternBase {
         currentIndex > 0
       ) {
         const newQuality = qualityLevels[currentIndex - 1];
-        console.log(`🔻 LOD: Downgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`);
+        console.log(
+          `🔻 LOD: Downgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`
+        );
         this.setQuality(newQuality);
         this.lodState.downgradeFrameCount = 0;
         this.lodState.lastQualityChange = now;
@@ -581,7 +583,9 @@ export class HyperspaceTunnel extends PatternBase {
         currentIndex < qualityLevels.length - 1
       ) {
         const newQuality = qualityLevels[currentIndex + 1];
-        console.log(`🔺 LOD: Upgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`);
+        console.log(
+          `🔺 LOD: Upgrading quality ${this.currentQuality} → ${newQuality} (FPS: ${avgFPS.toFixed(1)})`
+        );
         this.setQuality(newQuality);
         this.lodState.upgradeFrameCount = 0;
         this.lodState.lastQualityChange = now;

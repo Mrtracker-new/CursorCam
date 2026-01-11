@@ -414,7 +414,7 @@ export class NeonTunnel extends PatternBase {
           const depthRatio = frame.depth / this.config.maxDepth;
 
           // Mid frequencies control curve direction
-          const midInfluence = ((this.lastAudioData?.midEnergy || 0.5) - 0.5); // Range: -0.5 to 0.5
+          const midInfluence = (this.lastAudioData?.midEnergy || 0.5) - 0.5; // Range: -0.5 to 0.5
 
           // Sine wave offset along depth
           const curvePhase = depthRatio * Math.PI * 2 + this.frameCount * 0.02;
@@ -716,7 +716,7 @@ export class NeonTunnel extends PatternBase {
     for (const frame of frames) {
       // Use stereo-specific properties if in SPLIT mode
       let frameColor = frame.color;
-      let frameScale = frame.scale;
+      const frameScale = frame.scale;
 
       if (stereoChannel === 'left' && frame.leftColor && frame.leftScale) {
         frameColor = frame.leftColor;
@@ -727,7 +727,12 @@ export class NeonTunnel extends PatternBase {
           frame.leftScale,
           frame.rotation
         );
-        const projectedVertices = this._applyPerspective(tempFrame, canvas.width, canvas.height, offsetX);
+        const projectedVertices = this._applyPerspective(
+          tempFrame,
+          canvas.width,
+          canvas.height,
+          offsetX
+        );
         this._drawFrame(ctx, projectedVertices, frameColor, frame.thickness);
         continue;
       } else if (stereoChannel === 'right' && frame.rightColor && frame.rightScale) {
@@ -739,7 +744,12 @@ export class NeonTunnel extends PatternBase {
           frame.rightScale,
           frame.rotation
         );
-        const projectedVertices = this._applyPerspective(tempFrame, canvas.width, canvas.height, offsetX);
+        const projectedVertices = this._applyPerspective(
+          tempFrame,
+          canvas.width,
+          canvas.height,
+          offsetX
+        );
         this._drawFrame(ctx, projectedVertices, frameColor, frame.thickness);
         continue;
       }

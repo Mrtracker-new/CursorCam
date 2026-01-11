@@ -39,7 +39,7 @@ const StrobePatterns = {
  * Morse code patterns
  */
 const MorseCode = {
-  BEAT: 'BEAT',  // Flash on every beat
+  BEAT: 'BEAT', // Flash on every beat
   S: [3, 3, 3, 3, 3], // ... (dot-gap-dot-gap-dot)
   O: [9, 3, 9, 3, 9], // --- (dash-gap-dash-gap-dash)
 };
@@ -207,10 +207,12 @@ export class StrobeDiamondTunnel extends PatternBase {
    */
   _updateStrobeSystem(visualParams) {
     // RGB hue cycling (continuous) - cycle when in RGB/Rainbow mode OR when color mode is set
-    if (this.strobeState === StrobeState.RGB_CYCLE ||
+    if (
+      this.strobeState === StrobeState.RGB_CYCLE ||
       this.strobeState === StrobeState.RAINBOW ||
       this._applyColorMode === 'rgb' ||
-      this._applyColorMode === 'rainbow') {
+      this._applyColorMode === 'rainbow'
+    ) {
       this.rgbHue = (this.rgbHue + this.rgbSpeed) % 360;
     }
 
@@ -226,7 +228,7 @@ export class StrobeDiamondTunnel extends PatternBase {
           // Simple beat mode - handled in _onBeat
         } else if (Array.isArray(this.morsePattern)) {
           const duration = this.morsePattern[this.morseIndex];
-          const isFlash = (this.morseIndex % 2 === 0);
+          const isFlash = this.morseIndex % 2 === 0;
 
           if (isFlash) {
             this._triggerStrobe(StrobeState.WHITE, duration);
