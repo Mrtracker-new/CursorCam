@@ -24,6 +24,8 @@ const PolygonType = {
 const TunnelPattern = {
   STRAIGHT: 'straight', // Standard forward motion
   TWISTED: 'twisted', // Step-rotation per frame
+  CURVED: 'curved', // Serpentine lateral movement
+  PULSING_WIDTH: 'pulsing_width', // Width varies along depth
   COLLAPSING: 'collapsing', // Frames compress inward
   EXPANDING: 'expanding', // Frames push outward
   SPLIT: 'split', // Two-lane tunnel
@@ -71,6 +73,16 @@ class TunnelFrame {
     this.color = color;
     this.thickness = thickness;
     this.visible = true;
+
+    // Path variation properties
+    this.offsetX = 0;
+    this.offsetY = 0;
+
+    // Stereo split properties
+    this.leftScale = scale;
+    this.rightScale = scale;
+    this.leftColor = color;
+    this.rightColor = color;
   }
 }
 
@@ -103,6 +115,7 @@ export class NeonTunnel extends PatternBase {
     this.beatCount = 0;
     this.barCount = 0;
     this.lastBeatTime = 0;
+    this.lastAudioData = null; // Store for pattern calculations
 
     // Color state
     this.currentPalette = [...NEON_PALETTE];
@@ -225,6 +238,9 @@ export class NeonTunnel extends PatternBase {
    */
   update(network, audioData, beatData) {
     this.frameCount++;
+
+    // Store audio data for pattern calculations
+    this.lastAudioData = audioData;
 
     // Handle beat events
     if (beatData.isBeat && beatData.confidence > 0.6) {
@@ -378,10 +394,56 @@ export class NeonTunnel extends PatternBase {
         break;
 
       case TunnelPattern.TWISTED:
-        // Step-rotation based on depth
+        // Enhanced: Audio-reactive rotation intensity
+        const twistIntensity = 15 + (this.lastAudioData?.midEnergy || 0) * 30; // 15°-45° per step
+
         for (const frame of this.frames) {
           const rotationSteps = Math.floor(frame.depth / 100);
-          frame.rotation = rotationSteps * 15 * (Math.PI / 180); // 15° per step
+          frame.rotation = rotationSteps * twistIntensity * (Math.PI / 180);
+
+          // Add continuous rotation on high energy
+          if ((this.lastAudioData?.totalEnergy || 0) > 0.7) {
+            frame.rotation += this.frameCount * 0.01;
+          }
+        }
+        break;
+
+      case TunnelPattern.CURVED:
+        // Lateral offset based on depth and audio (serpentine motion)
+        for (const frame of this.frames) {
+          const depthRatio = frame.depth / this.config.maxDepth;
+
+          // Mid frequencies control curve direction
+          const midInfluence = ((this.lastAudioData?.midEnergy || 0.5) - 0.5); // Range: -0.5 to 0.5
+
+          // Sine wave offset along depth
+          const curvePhase = depthRatio * Math.PI * 2 + this.frameCount * 0.02;
+          frame.offsetX = Math.sin(curvePhase + midInfluence * Math.PI) * 200;
+          frame.offsetY = Math.cos(curvePhase * 1.3) * 100;
+        }
+        break;
+
+      case TunnelPattern.PULSING_WIDTH:
+        // Width varies sinusoidally along depth, modulated by bass
+        for (const frame of this.frames) {
+          const depthRatio = frame.depth / this.config.maxDepth;
+          const bassEnergy = this.lastAudioData?.bassEnergy || 0.5;
+
+          // Sine wave width variation
+          const widthPhase = depthRatio * Math.PI * 4; // 4 cycles along tunnel
+          const widthMod = 0.7 + Math.sin(widthPhase + this.frameCount * 0.05) * 0.3 * bassEnergy;
+
+          // Apply to scale
+          const depthFactor = 1.0 - frame.depth / this.config.maxDepth;
+          const baseFrameScale = this.config.baseScale * (0.3 + depthFactor * 2.5);
+          frame.scale = baseFrameScale * widthMod;
+
+          // Regenerate vertices
+          frame.vertices = this._generatePolygonVertices(
+            frame.shapeType.vertices,
+            frame.scale,
+            frame.rotation
+          );
         }
         break;
 
@@ -402,9 +464,27 @@ export class NeonTunnel extends PatternBase {
         break;
 
       case TunnelPattern.SPLIT:
-        // Will be handled in render (render twice with offset)
+        // Enhanced: Stereo-based split with independent scaling
+        const leftEnergy = this.lastAudioData?.totalEnergy || 0.5;
+        const rightEnergy = this.lastAudioData?.totalEnergy || 0.5;
+
+        for (const frame of this.frames) {
+          // Store stereo-specific data for render
+          frame.leftScale = frame.scale * (0.8 + leftEnergy * 0.4);
+          frame.rightScale = frame.scale * (0.8 + rightEnergy * 0.4);
+          frame.leftColor = this._getColorByEnergy(leftEnergy);
+          frame.rightColor = this._getColorByEnergy(rightEnergy);
+        }
         break;
     }
+  }
+
+  /**
+   * Get color based on energy level
+   */
+  _getColorByEnergy(energy) {
+    const index = Math.floor(energy * (NEON_PALETTE.length - 1));
+    return NEON_PALETTE[Math.min(index, NEON_PALETTE.length - 1)];
   }
 
   /**
@@ -549,9 +629,9 @@ export class NeonTunnel extends PatternBase {
 
     // Render frames
     if (this.currentPattern === TunnelPattern.SPLIT) {
-      // Render twice with offset
-      this._renderFrames(ctx, canvas, visibleFrames, -100);
-      this._renderFrames(ctx, canvas, visibleFrames, 100);
+      // Render left and right tunnels with stereo properties
+      this._renderFrames(ctx, canvas, visibleFrames, -150, 'left');
+      this._renderFrames(ctx, canvas, visibleFrames, 150, 'right');
     } else {
       this._renderFrames(ctx, canvas, visibleFrames, 0);
     }
@@ -623,7 +703,7 @@ export class NeonTunnel extends PatternBase {
   /**
    * Render tunnel frames
    */
-  _renderFrames(ctx, canvas, frames, offsetX = 0) {
+  _renderFrames(ctx, canvas, frames, offsetX = 0, stereoChannel = null) {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -634,29 +714,64 @@ export class NeonTunnel extends PatternBase {
     ctx.translate(-centerX, -centerY);
 
     for (const frame of frames) {
-      // Apply perspective projection
-      const projectedVertices = this._applyPerspective(frame, canvas.width, canvas.height, offsetX);
+      // Use stereo-specific properties if in SPLIT mode
+      let frameColor = frame.color;
+      let frameScale = frame.scale;
 
-      // Draw wireframe
-      ctx.strokeStyle = frame.color;
-      ctx.lineWidth = frame.thickness;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'miter';
-
-      ctx.beginPath();
-      for (let i = 0; i < projectedVertices.length; i++) {
-        const v = projectedVertices[i];
-        if (i === 0) {
-          ctx.moveTo(v.x, v.y);
-        } else {
-          ctx.lineTo(v.x, v.y);
-        }
+      if (stereoChannel === 'left' && frame.leftColor && frame.leftScale) {
+        frameColor = frame.leftColor;
+        // Create temporary frame copy with left scale for projection
+        const tempFrame = { ...frame, scale: frame.leftScale };
+        tempFrame.vertices = this._generatePolygonVertices(
+          frame.shapeType.vertices,
+          frame.leftScale,
+          frame.rotation
+        );
+        const projectedVertices = this._applyPerspective(tempFrame, canvas.width, canvas.height, offsetX);
+        this._drawFrame(ctx, projectedVertices, frameColor, frame.thickness);
+        continue;
+      } else if (stereoChannel === 'right' && frame.rightColor && frame.rightScale) {
+        frameColor = frame.rightColor;
+        // Create temporary frame copy with right scale for projection
+        const tempFrame = { ...frame, scale: frame.rightScale };
+        tempFrame.vertices = this._generatePolygonVertices(
+          frame.shapeType.vertices,
+          frame.rightScale,
+          frame.rotation
+        );
+        const projectedVertices = this._applyPerspective(tempFrame, canvas.width, canvas.height, offsetX);
+        this._drawFrame(ctx, projectedVertices, frameColor, frame.thickness);
+        continue;
       }
-      ctx.closePath();
-      ctx.stroke();
+
+      // Standard rendering
+      const projectedVertices = this._applyPerspective(frame, canvas.width, canvas.height, offsetX);
+      this._drawFrame(ctx, projectedVertices, frameColor, frame.thickness);
     }
 
     ctx.restore();
+  }
+
+  /**
+   * Draw a single frame
+   */
+  _drawFrame(ctx, projectedVertices, color, thickness) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'miter';
+
+    ctx.beginPath();
+    for (let i = 0; i < projectedVertices.length; i++) {
+      const v = projectedVertices[i];
+      if (i === 0) {
+        ctx.moveTo(v.x, v.y);
+      } else {
+        ctx.lineTo(v.x, v.y);
+      }
+    }
+    ctx.closePath();
+    ctx.stroke();
   }
 
   /**
@@ -670,14 +785,18 @@ export class NeonTunnel extends PatternBase {
     // Perspective scale factor
     const perspectiveScale = this.config.fov / (frame.depth + this.config.fov);
 
+    // Apply frame offsets (for CURVED pattern)
+    const frameOffsetX = (frame.offsetX || 0) * perspectiveScale;
+    const frameOffsetY = (frame.offsetY || 0) * perspectiveScale;
+
     for (const vertex of frame.vertices) {
       // Apply frame rotation to vertex
       const rotatedX = vertex.x * Math.cos(frame.rotation) - vertex.y * Math.sin(frame.rotation);
       const rotatedY = vertex.x * Math.sin(frame.rotation) + vertex.y * Math.cos(frame.rotation);
 
-      // Project to screen space
-      const screenX = rotatedX * perspectiveScale + centerX + offsetX;
-      const screenY = rotatedY * perspectiveScale + centerY;
+      // Project to screen space with offsets
+      const screenX = rotatedX * perspectiveScale + centerX + offsetX + frameOffsetX;
+      const screenY = rotatedY * perspectiveScale + centerY + frameOffsetY;
 
       projectedVertices.push({ x: screenX, y: screenY });
     }
