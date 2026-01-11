@@ -190,6 +190,78 @@ class CursorCam {
         }
       });
     }
+
+    // Hyperspace quality switcher
+    const hyperspaceQualitySelector = document.getElementById('hyperspace-quality');
+    if (hyperspaceQualitySelector) {
+      hyperspaceQualitySelector.addEventListener('change', (e) => {
+        if (this.patterns.hyperspace && this.patterns.hyperspace.setQuality) {
+          this.patterns.hyperspace.setQuality(e.target.value);
+        }
+      });
+    }
+
+    // Strobe Diamond Tunnel controls
+    const strobePatternSelector = document.getElementById('strobe-pattern');
+    if (strobePatternSelector) {
+      strobePatternSelector.addEventListener('change', (e) => {
+        const pattern = this.patterns['diamond-strobe'];
+        if (pattern) {
+          const patterns = {
+            'classic': ['RED', 'WHITE'],
+            'double': ['RED', 'RED', 'WHITE', 'WHITE'],
+            'triplet': ['RED', 'WHITE', 'OFF'],
+            'quad': ['RED', 'WHITE', 'RGB_CYCLE', 'OFF'],
+            'random': 'RANDOM'
+          };
+          pattern.currentPattern = patterns[e.target.value];
+          pattern.patternIndex = 0;
+        }
+      });
+    }
+
+    const strobeColorSelector = document.getElementById('strobe-color');
+    if (strobeColorSelector) {
+      strobeColorSelector.addEventListener('change', (e) => {
+        const pattern = this.patterns['diamond-strobe'];
+        if (pattern) {
+          if (e.target.value === 'rgb') {
+            // Enable continuous RGB cycling
+            pattern._applyColorMode = 'rgb';
+          } else if (e.target.value === 'rainbow') {
+            // Enable continuous rainbow
+            pattern._applyColorMode = 'rainbow';
+          } else {
+            // Normal mode (pattern-based)
+            pattern._applyColorMode = 'normal';
+          }
+          console.log(`🎨 Strobe color mode: ${e.target.value}`);
+        }
+      });
+    }
+
+    const strobeMorseSelector = document.getElementById('strobe-morse');
+    if (strobeMorseSelector) {
+      strobeMorseSelector.addEventListener('change', (e) => {
+        const pattern = this.patterns['diamond-strobe'];
+        if (pattern) {
+          if (e.target.value === 'off') {
+            pattern.morseMode = false;
+          } else if (e.target.value === 'beat') {
+            pattern.morseMode = true;
+            pattern.morsePattern = 'BEAT';
+          } else if (e.target.value === 's') {
+            pattern.morseMode = true;
+            pattern.morsePattern = [3, 3, 3, 3, 3];
+            pattern.morseIndex = 0;
+          } else if (e.target.value === 'o') {
+            pattern.morseMode = true;
+            pattern.morsePattern = [9, 3, 9, 3, 9];
+            pattern.morseIndex = 0;
+          }
+        }
+      });
+    }
   }
 
   /**
@@ -267,6 +339,16 @@ class CursorCam {
           particleControls.style.display = 'block';
         } else {
           particleControls.style.display = 'none';
+        }
+      }
+
+      // Show/hide strobe diamond controls
+      const strobeControls = document.getElementById('strobe-controls');
+      if (strobeControls) {
+        if (patternKey === 'diamond-strobe') {
+          strobeControls.style.display = 'block';
+        } else {
+          strobeControls.style.display = 'none';
         }
       }
     }
