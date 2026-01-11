@@ -14,6 +14,10 @@ import { StateManager } from './cyberpunk/StateManager.js';
 import { GeometryManager } from './cyberpunk/GeometryManager.js';
 import { LightningSystem } from './cyberpunk/LightningSystem.js';
 import { ParticleEngine } from './cyberpunk/ParticleEngine.js';
+import { DigitalRainSystem } from './cyberpunk/DigitalRainSystem.js';
+import { GlitchSystem } from './cyberpunk/GlitchSystem.js';
+import { NeonGridSystem } from './cyberpunk/NeonGridSystem.js';
+import { CameraShakeSystem } from './cyberpunk/CameraShakeSystem.js';
 
 /**
  * Cyberpunk Reactive Mode - High-energy music-reactive visual system
@@ -38,6 +42,10 @@ export class CyberpunkMode extends PatternBase {
     this.geometryManager = null;
     this.lightningSystem = null;
     this.particleEngine = null;
+    this.digitalRain = null;
+    this.glitchSystem = null;
+    this.neonGrid = null;
+    this.cameraShake = null;
 
     // State
     this.frameCount = 0;
@@ -107,10 +115,17 @@ export class CyberpunkMode extends PatternBase {
     this.geometryManager = new GeometryManager(this.scene, this.colorManager);
     this.lightningSystem = new LightningSystem(this.scene, this.colorManager);
     this.particleEngine = new ParticleEngine(this.scene, this.colorManager);
+    this.digitalRain = new DigitalRainSystem(this.scene, this.colorManager);
+    this.glitchSystem = new GlitchSystem(this.composer, this.colorManager);
+    this.neonGrid = new NeonGridSystem(this.scene, this.colorManager);
+    this.cameraShake = new CameraShakeSystem(this.camera);
 
     // Create visual elements
     this.geometryManager.create();
     this.particleEngine.create();
+    this.digitalRain.create();
+    this.glitchSystem.create();
+    this.neonGrid.create();
     this._setupLighting();
 
     // Show cyberpunk controls
@@ -227,6 +242,10 @@ export class CyberpunkMode extends PatternBase {
     this.geometryManager.update(audioData, stateVisuals);
     this.lightningSystem.update(audioData, stateVisuals);
     this.particleEngine.update(audioData, stateVisuals);
+    this.digitalRain.update(audioData, stateVisuals);
+    this.glitchSystem.update(audioData, stateVisuals);
+    this.neonGrid.update(audioData, stateVisuals);
+    this.cameraShake.update(audioData);
 
     // Update bloom based on total energy
     const app = window.cursorCam;
@@ -287,11 +306,16 @@ export class CyberpunkMode extends PatternBase {
   _onBeatDrop(audioData) {
     console.log('💥 Beat drop detected!', audioData.beatDropIntensity);
 
+    // Trigger glitch effect
+    if (this.glitchSystem) {
+      this.glitchSystem.triggerGlitch(audioData.beatDropIntensity);
+    }
+
     // Geometry response
     this.geometryManager.onBeatDrop(audioData.beatDropIntensity);
 
-    // Force PORTAL mode
-    this.stateManager.setState('PORTAL');
+    // Force DROP state
+    this.stateManager.setState('DROP');
 
     // Color palette swap
     this.colorManager.swapPalette();
@@ -347,6 +371,18 @@ export class CyberpunkMode extends PatternBase {
     }
     if (this.particleEngine) {
       this.particleEngine.dispose();
+    }
+    if (this.digitalRain) {
+      this.digitalRain.dispose();
+    }
+    if (this.glitchSystem) {
+      this.glitchSystem.dispose();
+    }
+    if (this.neonGrid) {
+      this.neonGrid.dispose();
+    }
+    if (this.cameraShake) {
+      this.cameraShake.dispose();
     }
 
     // Dispose renderer and composer
