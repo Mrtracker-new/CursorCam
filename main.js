@@ -23,6 +23,7 @@ import { ParticleEnergy } from './patterns/ParticleEnergy.js';
 import { CyberpunkMode } from './patterns/CyberpunkMode.js';
 import { AudioLandscape } from './patterns/AudioLandscape.js';
 
+
 /**
  * Main CursorCam Application
  */
@@ -52,6 +53,7 @@ class CursorCam {
       particles: new ParticleEnergy(),
       cyberpunk: new CyberpunkMode(),
       landscape: new AudioLandscape(),
+
     };
     this.currentPattern = this.patterns['pulsing']; // Default pattern
 
@@ -264,6 +266,8 @@ class CursorCam {
         }
       });
     }
+
+
   }
 
   /**
@@ -353,6 +357,8 @@ class CursorCam {
           strobeControls.style.display = 'none';
         }
       }
+
+
     }
   }
 
